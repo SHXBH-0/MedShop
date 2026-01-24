@@ -1,5 +1,9 @@
 package com.example.medicalshopapp
 
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.focus.onFocusChanged
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -809,6 +813,26 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
     var dlNo by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
+    val storeFocus = remember { FocusRequester() }
+    val dlFocus = remember { FocusRequester() }
+    val addressFocus = remember { FocusRequester() }
+    val nameFocus = remember { FocusRequester() }
+    val phoneFocus = remember { FocusRequester() }
+    val emailFocus = remember { FocusRequester() }
+    val passFocus = remember { FocusRequester() }
+    // Bring-into-view requesters
+    val storeBiv = remember { BringIntoViewRequester() }
+    val dlBiv = remember { BringIntoViewRequester() }
+    val addressBiv = remember { BringIntoViewRequester() }
+    val nameBiv = remember { BringIntoViewRequester() }
+    val phoneBiv = remember { BringIntoViewRequester() }
+    val emailBiv = remember { BringIntoViewRequester() }
+    val passBiv = remember { BringIntoViewRequester() }
+
+// Coroutine scope for scrolling
+    val scope = rememberCoroutineScope()
+
+
     val isLoading by viewModel.isLoading.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
 
@@ -827,25 +851,196 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
                 }
                 item {
                     SectionHeader("Store Details")
-                    OutlinedTextField(value = store, onValueChange = { store = it }, label = { Text("Pharmacy / Store Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = store,
+                        onValueChange = { store = it },
+                        label = { Text("Pharmacy / Store Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(storeFocus)
+                            .focusRequester(storeFocus)
+                            .bringIntoViewRequester(storeBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { storeBiv.bringIntoView() }
+                                }
+                            }
+                        ,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { dlFocus.requestFocus() }
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = dlNo, onValueChange = { dlNo = it }, label = { Text("Drug License No.") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = dlNo,
+                        onValueChange = { dlNo = it },
+                        label = { Text("Drug License No.") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(dlFocus)
+                            .focusRequester(dlFocus)
+                            .bringIntoViewRequester(dlBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { dlBiv.bringIntoView() }
+                                }
+                            }
+                        ,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { addressFocus.requestFocus() }
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = address, onValueChange = { address = it }, label = { Text("Full Store Address") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), minLines = 2)
+                    OutlinedTextField(
+                        value = address,
+                        onValueChange = { address = it },
+                        label = { Text("Full Store Address") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(addressFocus)
+                            .focusRequester(addressFocus)
+                            .bringIntoViewRequester(addressBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { addressBiv.bringIntoView() }
+                                }
+                            }
+                        ,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { nameFocus.requestFocus() }
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        minLines = 2
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     SectionHeader("Owner Information")
-                    OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Owner Full Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Owner Full Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(nameFocus)
+                            .focusRequester(nameFocus)
+                            .bringIntoViewRequester(nameBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { nameBiv.bringIntoView() }
+                                }
+                            }
+                        ,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { phoneFocus.requestFocus() }
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = phone, onValueChange = { phone = it }, label = { Text("Mobile Number") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = { phone = it },
+                        label = { Text("Mobile Number") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(phoneFocus)
+                            .focusRequester(phoneFocus)
+                            .bringIntoViewRequester(phoneBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { phoneBiv.bringIntoView() }
+                                }
+                            }
+                        ,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { emailFocus.requestFocus() }
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email Address") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email Address") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(emailFocus)
+                            .focusRequester(emailFocus)
+                            .bringIntoViewRequester(emailBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { emailBiv.bringIntoView() }
+                                }
+                            }
+                        ,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { passFocus.requestFocus() }
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     SectionHeader("Security")
-                    OutlinedTextField(value = pass, onValueChange = { pass = it }, label = { Text("Create Password") }, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = pass,
+                        onValueChange = { pass = it },
+                        label = { Text("Create Password") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(passFocus).focusRequester(passFocus)
+                            .bringIntoViewRequester(passBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { passBiv.bringIntoView() }
+                                }
+                            }
+                        ,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                viewModel.signup(
+                                    name,
+                                    store,
+                                    email,
+                                    phone,
+                                    address,
+                                    dlNo,
+                                    pass
+                                ) {
+                                    navController.navigate("main") {
+                                        popUpTo("onboarding") { inclusive = true }
+                                    }
+                                }
+                            }
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
                     Spacer(modifier = Modifier.height(32.dp))
                 }
                 item {
@@ -1104,6 +1299,34 @@ fun InventoryTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddStockTab(viewModel: ShopViewModel, onAdded: () -> Unit, onOpenDrawer: () -> Unit) {
+    // Focus requesters
+    val nameFocus = remember { FocusRequester() }
+    val categoryFocus = remember { FocusRequester() }
+    val shortIdFocus = remember { FocusRequester() }
+    val batchFocus = remember { FocusRequester() }
+    val saltFocus = remember { FocusRequester() }
+    val qtyFocus = remember { FocusRequester() }
+    val expiryFocus = remember { FocusRequester() }
+    val costFocus = remember { FocusRequester() }
+    val mrpFocus = remember { FocusRequester() }
+    val dealerFocus = remember { FocusRequester() }
+
+
+
+
+// Bring-into-view requesters
+    val nameBiv = remember { BringIntoViewRequester() }
+    val shortIdBiv = remember { BringIntoViewRequester() }
+    val batchBiv = remember { BringIntoViewRequester() }
+    val saltBiv = remember { BringIntoViewRequester() }
+    val qtyBiv = remember { BringIntoViewRequester() }
+    val expiryBiv = remember { BringIntoViewRequester() }
+    val costBiv = remember { BringIntoViewRequester() }
+    val mrpBiv = remember { BringIntoViewRequester() }
+    val dealerBiv = remember { BringIntoViewRequester() }
+
+    val scope = rememberCoroutineScope()
+
     val apiResults by viewModel.apiResults.collectAsState()
     val isApiLoading by viewModel.isApiLoading.collectAsState()
     val dealers by viewModel.dealers.collectAsState()
@@ -1134,8 +1357,27 @@ fun AddStockTab(viewModel: ShopViewModel, onAdded: () -> Unit, onOpenDrawer: () 
                 SectionHeader("Smart Search")
                 Box {
                     OutlinedTextField(
-                        value = name, onValueChange = { name = it; if(it.length>1) { viewModel.searchApi(it); showApiDropdown = true } else { showApiDropdown = false; isRestockMode = false } }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(nameFocus)
+                            .bringIntoViewRequester(nameBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    scope.launch { nameBiv.bringIntoView() }
+                                }
+                            },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { shortIdFocus.requestFocus() }
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = BrandPrimary
+                        )
                     )
+
                     if (showApiDropdown && (localMatches.isNotEmpty() || apiResults.isNotEmpty())) {
                         Card(modifier = Modifier.padding(top=56.dp).heightIn(max=250.dp), colors = CardDefaults.cardColors(containerColor = BrandSurface), elevation = CardDefaults.cardElevation(8.dp)) {
                             LazyColumn {
@@ -1160,22 +1402,217 @@ fun AddStockTab(viewModel: ShopViewModel, onAdded: () -> Unit, onOpenDrawer: () 
                             DropdownMenu(expanded = showCat, onDismissRequest = { showCat = false }, modifier = Modifier.background(BrandSurface)) { CategoryUtils.categories.forEach { c -> DropdownMenuItem(text = { Text(c.name) }, onClick = { category = c.name; showCat = false }) } }
                         }
                         Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = shortId, onValueChange = { shortId = it.uppercase() }, label = { Text("Short ID") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = batch, onValueChange = { batch = it.uppercase() }, label = { Text("Batch No") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
-                        Spacer(Modifier.height(12.dp))
-                        OutlinedTextField(value = salt, onValueChange = { salt = it }, label = { Text("Salt Composition") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp))
+                        {
+                            OutlinedTextField(
+                                value = shortId,
+                                onValueChange = { shortId = it.uppercase() },
+                                label = { Text("Short ID") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(shortIdFocus)
+                                    .bringIntoViewRequester(shortIdBiv)
+                                    .onFocusChanged {
+                                        if (it.isFocused) {
+                                            scope.launch { shortIdBiv.bringIntoView() }
+                                        }
+                                    },
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                                keyboardActions = KeyboardActions(
+                                    onNext = { batchFocus.requestFocus() }
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = BrandPrimary
+                                )
+                            )
+
+
+                            OutlinedTextField(
+                                value = batch,
+                                onValueChange = { batch = it.uppercase() },
+                                label = { Text("Batch No") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(batchFocus)
+                                    .bringIntoViewRequester(batchBiv)
+                                    .onFocusChanged {
+                                        if (it.isFocused) {
+                                            scope.launch { batchBiv.bringIntoView() }
+                                        }
+                                    },
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                                keyboardActions = KeyboardActions(
+                                    onNext = { saltFocus.requestFocus() }
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = BrandPrimary
+                                )
+                            )
+                        }
+                            Spacer(Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = salt,
+                            onValueChange = { salt = it },
+                            label = { Text("Salt Composition") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(saltFocus)
+                                .bringIntoViewRequester(saltBiv)
+                                .onFocusChanged {
+                                    if (it.isFocused) {
+                                        scope.launch { saltBiv.bringIntoView() }
+                                    }
+                                },
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                            keyboardActions = KeyboardActions(
+                                onNext = { qtyFocus.requestFocus() }
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = BrandPrimary
+                            )
+                        )
+
                     }
                 }
 
                 SectionHeader("Stock & Supplier")
                 Card(colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(16.dp)) {
                     Column(Modifier.padding(16.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = qty, onValueChange = { qty = it }, label = { Text("Qty ($unitLabel)") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = expiry, onValueChange = { expiry = it }, label = { Text("Exp (MM/YY)") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp))
+                        { OutlinedTextField(
+                            value = qty,
+                            onValueChange = { qty = it },
+                            label = { Text("Qty ($unitLabel)") },
+                            modifier = Modifier
+                                .weight(1f)
+                                .focusRequester(qtyFocus)
+                                .bringIntoViewRequester(qtyBiv)
+                                .onFocusChanged {
+                                    if (it.isFocused) {
+                                        scope.launch { qtyBiv.bringIntoView() }
+                                    }
+                                },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onNext = { expiryFocus.requestFocus() }
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = BrandPrimary
+                            )
+                        )
+
+                            OutlinedTextField(
+                                value = expiry,
+                                onValueChange = { expiry = it },
+                                label = { Text("Exp (MM/YY)") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(expiryFocus)
+                                    .bringIntoViewRequester(expiryBiv)
+                                    .onFocusChanged {
+                                        if (it.isFocused) {
+                                            scope.launch { expiryBiv.bringIntoView() }
+                                        }
+                                    },
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                                keyboardActions = KeyboardActions(
+                                    onNext = { costFocus.requestFocus() }
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = BrandPrimary
+                                )
+                            )
+                        }
                         Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text("Buy Rate") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = mrp, onValueChange = { mrp = it }, label = { Text("MRP") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp))
+                        { OutlinedTextField(
+                            value = cost,
+                            onValueChange = { cost = it },
+                            label = { Text("Buy Rate") },
+                            modifier = Modifier
+                                .weight(1f)
+                                .focusRequester(costFocus)
+                                .bringIntoViewRequester(costBiv)
+                                .onFocusChanged {
+                                    if (it.isFocused) {
+                                        scope.launch { costBiv.bringIntoView() }
+                                    }
+                                },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onNext = { mrpFocus.requestFocus() }
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = BrandPrimary
+                            )
+                        )
+
+                            OutlinedTextField(
+                                value = mrp,
+                                onValueChange = { mrp = it },
+                                label = { Text("MRP") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(mrpFocus)
+                                    .bringIntoViewRequester(mrpBiv)
+                                    .onFocusChanged {
+                                        if (it.isFocused) {
+                                            scope.launch { mrpBiv.bringIntoView() }
+                                        }
+                                    },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Next
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onNext = { dealerFocus.requestFocus() }
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = BrandPrimary
+                                )
+                            )
+
+                        }
                         Spacer(Modifier.height(12.dp))
                         Box {
-                            OutlinedTextField(value = selectedDealer?.agencyName?:"", onValueChange = {}, readOnly = true, label = { Text("Supplier") }, modifier = Modifier.fillMaxWidth(), trailingIcon = { IconButton(onClick = { showDeal = true }) { Icon(Icons.Default.ArrowDropDown, null) } }, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
-                            DropdownMenu(expanded = showDeal, onDismissRequest = { showDeal = false }, modifier = Modifier.background(BrandSurface)) { dealers.forEach { d -> DropdownMenuItem(text = { Text(d.agencyName) }, onClick = { selectedDealer = d; showDeal = false }) } }
+                            OutlinedTextField(
+                                value = selectedDealer?.agencyName?:"",
+                                onValueChange = {}, readOnly = true,
+                                label = { Text("Supplier") },
+                                modifier = Modifier.fillMaxWidth().focusRequester(dealerFocus)
+                                    .bringIntoViewRequester(dealerBiv)
+                                    .onFocusChanged {
+                                        if (it.isFocused) {
+                                            scope.launch { dealerBiv.bringIntoView() }
+                                            showDeal = true
+                                        }
+                                    },
+                                trailingIcon = {
+                                    IconButton(onClick = { showDeal = true }) { Icon(Icons.Default.ArrowDropDown, null) } },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = BrandPrimary
+                                )
+                            )
+                            DropdownMenu(
+                                expanded = showDeal,
+                                onDismissRequest = { showDeal = false },
+                                modifier = Modifier.background(BrandSurface)) {
+                                dealers.forEach { d ->
+                                    DropdownMenuItem(
+                                        text = { Text(d.agencyName) },
+                                        onClick = {
+                                            selectedDealer = d;
+                                            showDeal = false
+                                        }
+                                    )
+                                }
+                            }
                         }
                         Spacer(Modifier.height(24.dp))
                         Button(onClick = { if(name.isNotEmpty()) { viewModel.addStock(Medicine(shortId = shortId, name = name, batchNo = batch, saltName = salt, category = category.ifBlank { "General" }, quantity = qty.toIntOrNull()?:0, purchasePrice = cost.toDoubleOrNull()?:0.0, sellingPrice = mrp.toDoubleOrNull()?:0.0, gstPercent = 12.0, expiryDate = expiry, dealerId = selectedDealer?.id?:"")); Toast.makeText(context, if(isRestockMode) "Stock Updated!" else "Added!", Toast.LENGTH_SHORT).show(); onAdded() } }, modifier = Modifier.fillMaxWidth().height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isRestockMode) WarningOrange else BrandPrimary), shape = RoundedCornerShape(12.dp)) { Text(if(isRestockMode) "UPDATE STOCK" else Strings.get("save_inventory", lang)) }
