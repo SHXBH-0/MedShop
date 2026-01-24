@@ -1,7 +1,7 @@
 **MedFlow Pro**<br>
 A pharmacy management app built with Jetpack Compose and Firebase.
 
-**1.Features**<br>
+**1.Features**
 - Inventory management
 - POS billing system
 - Dealer management
@@ -21,3 +21,4 @@ A pharmacy management app built with Jetpack Compose and Firebase.
 3. Add `google-services.json`
 4. Sync Gradle
 5. Run on emulator or device
+
