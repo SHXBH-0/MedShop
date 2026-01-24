@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "879422272232",
+    "project_id": "medflow-367a2",
+    "storage_bucket": "medflow-367a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879422272232:android:c78ba2f72ac64ec5944f5d",
+        "android_client_info": {
+          "package_name": "com.example.medicalshopapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlnsR6l_l4ijwZPZ74KnEP0gWDpj32-uc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
