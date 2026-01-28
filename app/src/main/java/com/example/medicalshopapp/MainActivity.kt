@@ -1,17 +1,15 @@
 package com.example.medicalshopapp
 
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.ui.focus.onFocusChanged
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.input.ImeAction
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,6 +30,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -41,12 +40,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChildCare
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Face
@@ -95,6 +95,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -127,6 +128,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -137,18 +139,22 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-
 
 // --- 1. LOCALIZATION SYSTEM ---
 
@@ -156,34 +162,34 @@ enum class AppLanguage(val code: String, val displayName: String) {
     ENGLISH("en", "English"),
     HINDI("hi", "हिंदी"),
     MARATHI("mr", "मराठी"),
-
+    TAMIL("ta", "தமிழ்")
 }
 
 object Strings {
     private val dictionary = mapOf(
-        "app_name" to mapOf(AppLanguage.ENGLISH to "MedFlow Pro", AppLanguage.HINDI to "मेडफ्लो प्रो", AppLanguage.MARATHI to "मेडफ्लो प्रो"),
-        "onboarding_welcome" to mapOf(AppLanguage.ENGLISH to "Manage Pharmacy Smartly", AppLanguage.HINDI to "फार्मेसी का स्मार्ट प्रबंधन", AppLanguage.MARATHI to "फार्मसीचे स्मार्ट व्यवस्थापन"),
-        "onboarding_tagline" to mapOf(AppLanguage.ENGLISH to "Billing, Inventory & Dealers in one place.", AppLanguage.HINDI to "बिलिंग, इन्वेंटरी और विक्रेता एक ही जगह।", AppLanguage.MARATHI to "बिलिंग, साठा आणि विक्रेते एकाच ठिकाणी."),
-        "get_started" to mapOf(AppLanguage.ENGLISH to "Get Started", AppLanguage.HINDI to "शुरू करें", AppLanguage.MARATHI to "सुरु करा"),
-        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन"),
-        "login_title" to mapOf(AppLanguage.ENGLISH to "Welcome Back", AppLanguage.HINDI to "स्वागत हे", AppLanguage.MARATHI to "स्वागत आहे"),
-        "login_subtitle" to mapOf(AppLanguage.ENGLISH to "Sign in to manage your pharmacy", AppLanguage.HINDI to "अपनी फार्मेसी का प्रबंधन करने के लिए साइन इन करें", AppLanguage.MARATHI to "तुमची फार्मसी व्यवस्थापित करण्यासाठी साइन इन करा"),
-        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा"),
-        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड"),
-        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा"),
-        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा"),
-        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते"),
-        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा..."),
-        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला"),
-        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक"),
-        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री"),
-        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार"),
-        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल"),
-        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा"),
-        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा"),
-        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास"),
-        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल"),
-        "view_all" to mapOf(AppLanguage.ENGLISH to "View All", AppLanguage.HINDI to "सभी देखें", AppLanguage.MARATHI to "सर्व पहा")
+        "app_name" to mapOf(AppLanguage.ENGLISH to "MedFlow Pro", AppLanguage.HINDI to "मेडफ्लो प्रो", AppLanguage.MARATHI to "मेडफ्लो प्रो", AppLanguage.TAMIL to "மெட்ஃப்ளோ ப்ரோ"),
+        "onboarding_welcome" to mapOf(AppLanguage.ENGLISH to "Manage Pharmacy Smartly", AppLanguage.HINDI to "फार्मेसी का स्मार्ट प्रबंधन", AppLanguage.MARATHI to "फार्मसीचे स्मार्ट व्यवस्थापन", AppLanguage.TAMIL to "மருந்தகத்தை நிர்வகிக்கவும்"),
+        "onboarding_tagline" to mapOf(AppLanguage.ENGLISH to "Billing, Inventory & Dealers in one place.", AppLanguage.HINDI to "बिलिंग, इन्वेंटरी और विक्रेता एक ही जगह।", AppLanguage.MARATHI to "बिलिंग, साठा आणि विक्रेते एकाच ठिकाणी.", AppLanguage.TAMIL to "பில்லிங் மற்றும் சரக்கு மேலாண்மை."),
+        "get_started" to mapOf(AppLanguage.ENGLISH to "Get Started", AppLanguage.HINDI to "शुरू करें", AppLanguage.MARATHI to "सुरु करा", AppLanguage.TAMIL to "தொடங்குங்கள்"),
+        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन", AppLanguage.TAMIL to "உள்நுழைய"),
+        "login_title" to mapOf(AppLanguage.ENGLISH to "Welcome Back", AppLanguage.HINDI to "स्वागत हे", AppLanguage.MARATHI to "स्वागत आहे", AppLanguage.TAMIL to "வரவேற்கிறோம்"),
+        "login_subtitle" to mapOf(AppLanguage.ENGLISH to "Sign in to manage your pharmacy", AppLanguage.HINDI to "अपनी फार्मेसी का प्रबंधन करने के लिए साइन इन करें", AppLanguage.MARATHI to "तुमची फार्मसी व्यवस्थापित करण्यासाठी साइन इन करा", AppLanguage.TAMIL to "உங்கள் மருந்தகத்தை நிர்வகிக்க உள்நுழையவும்"),
+        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा", AppLanguage.TAMIL to "கணக்கை உருவாக்கு"),
+        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड", AppLanguage.TAMIL to "முகப்பு"),
+        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा", AppLanguage.TAMIL to "சரக்கு"),
+        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा", AppLanguage.TAMIL to "சரக்கு சேர்"),
+        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते", AppLanguage.TAMIL to "வியாபாரிகள்"),
+        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा...", AppLanguage.TAMIL to "தேடு..."),
+        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला", AppLanguage.TAMIL to "கையிருப்பு இல்லை"),
+        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक", AppLanguage.TAMIL to "குறைவு"),
+        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री", AppLanguage.TAMIL to "விற்பனை"),
+        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार", AppLanguage.TAMIL to "சமீபத்திய பரிவர்த்தனைகள்"),
+        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल", AppLanguage.TAMIL to "மொத்த ரசீது"),
+        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा", AppLanguage.TAMIL to "ரசீது உருவாக்கு"),
+        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा", AppLanguage.TAMIL to "சேமி"),
+        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास", AppLanguage.TAMIL to "வரலாறு"),
+        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल", AppLanguage.TAMIL to "அறிக்கைகள்"),
+        "view_all" to mapOf(AppLanguage.ENGLISH to "View All", AppLanguage.HINDI to "सभी देखें", AppLanguage.MARATHI to "सर्व पहा", AppLanguage.TAMIL to "அனைத்தையும் பார்")
     )
 
     fun get(key: String, lang: AppLanguage): String {
@@ -266,11 +272,14 @@ data class Bill(
 
 data class User(val uid: String, val email: String, val storeName: String)
 
-// --- 3. VIEWMODEL WITH FIREBASE INTEGRATION ---
+// --- 3. VIEWMODEL WITH FIREBASE INTEGRATION & GEMINI API ---
 
 class ShopViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    // !!! REPLACE WITH YOUR ACTUAL API KEY !!!
+    private val GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"
 
     private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
     val medicinesFlow: StateFlow<List<Medicine>> = _medicines.asStateFlow()
@@ -458,21 +467,84 @@ class ShopViewModel : ViewModel() {
         db.collection("dealers").document(dealer.id).set(dealer)
     }
 
-    // Mock Global Search (unchanged)
+    // REAL GEMINI API IMPLEMENTATION (REST)
     fun searchApi(q: String) {
+        if (q.length < 3) return
+
         _isApiLoading.value = true
-        viewModelScope.launch {
-            delay(500)
-            val globalDatabase = listOf(
-                GlobalMedicine("Dolo 650", "Paracetamol 650mg", "Micro Labs", "DOLO650", "Tablet"),
-                GlobalMedicine("Crocin Advance", "Paracetamol 500mg", "GSK", "CROCIN", "Tablet"),
-                GlobalMedicine("Augmentin 625", "Amoxicillin", "GSK", "AUG625", "Tablet"),
-                GlobalMedicine("Benadryl", "Diphenhydramine", "J&J", "BENA", "Syrup"),
-                GlobalMedicine("Volini", "Diclofenac", "Sun Pharma", "VOLINI", "Ointment")
-            )
-            if (q.length < 2) _apiResults.value = emptyList()
-            else _apiResults.value = globalDatabase.filter { it.name.contains(q, true) || it.salt.contains(q, true) }
-            _isApiLoading.value = false
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // 1. Strict System Prompt
+                val prompt = """
+                    You are a strict JSON API. 
+                    List 5 medicines matching "$q" available in India.
+                    Output ONLY a JSON Array. No markdown, no "here is the list", no ```json.
+                    Schema: [{"name": "string", "salt": "string", "manufacturer": "string", "defaultCategory": "Tablet/Syrup/Injection", "defaultShortId": "string"}]
+                """.trimIndent()
+
+                // 2. Use Gemini 1.5 Flash (Fast & Stable)
+                val url = URL("[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$GEMINI_API_KEY](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$GEMINI_API_KEY)")
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "POST"
+                conn.setRequestProperty("Content-Type", "application/json")
+                conn.doOutput = true
+
+                // 3. Safe JSON Payload Construction
+                val safePrompt = prompt.replace("\"", "\\\"").replace("\n", " ")
+                val jsonPayload = "{\"contents\":[{\"parts\":[{\"text\":\"$safePrompt\"}]}]}"
+
+                conn.outputStream.use { it.write(jsonPayload.toByteArray()) }
+
+                // 4. Handle Response
+                val responseCode = conn.responseCode
+                if (responseCode == 200) {
+                    val reader = BufferedReader(InputStreamReader(conn.inputStream))
+                    val response = reader.readText()
+                    reader.close()
+
+                    // 5. Robust Parsing
+                    val root = JSONObject(response)
+                    val candidates = root.optJSONArray("candidates")
+                    if (candidates != null && candidates.length() > 0) {
+                        val text = candidates.getJSONObject(0)
+                            .getJSONObject("content")
+                            .getJSONArray("parts")
+                            .getJSONObject(0)
+                            .getString("text")
+
+                        // Extract JSON Array specifically (Find first '[' and last ']')
+                        val startIndex = text.indexOf('[')
+                        val endIndex = text.lastIndexOf(']')
+
+                        if (startIndex != -1 && endIndex != -1) {
+                            val jsonString = text.substring(startIndex, endIndex + 1)
+                            val jsonArray = JSONArray(jsonString)
+                            val results = mutableListOf<GlobalMedicine>()
+
+                            for (i in 0 until jsonArray.length()) {
+                                val obj = jsonArray.getJSONObject(i)
+                                results.add(GlobalMedicine(
+                                    name = obj.optString("name", "Unknown"),
+                                    salt = obj.optString("salt", "Composition unavailable"),
+                                    manufacturer = obj.optString("manufacturer", "Generic"),
+                                    defaultShortId = obj.optString("defaultShortId", "GEN"),
+                                    defaultCategory = obj.optString("defaultCategory", "Tablet")
+                                ))
+                            }
+                            _apiResults.value = results
+                        }
+                    }
+                } else {
+                    Log.e("GeminiAPI", "Error Code: $responseCode")
+                }
+            } catch (e: Exception) {
+                Log.e("GeminiAPI", "Exception: ${e.message}")
+                e.printStackTrace()
+                _apiResults.value = emptyList()
+            } finally {
+                _isApiLoading.value = false
+            }
         }
     }
 
@@ -698,8 +770,6 @@ fun OnboardingScreen(navController: NavController, viewModel: ShopViewModel) {
 fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val emailFocus = remember { FocusRequester() }
-    val passwordFocus = remember { FocusRequester() }
     val isLoading by viewModel.isLoading.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
     val context = LocalContext.current
@@ -723,66 +793,27 @@ fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
                 }
                 item {
                     OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
+                        value = email, onValueChange = { email = it },
                         label = { Text("Email Address") },
                         leadingIcon = { Icon(Icons.Default.Email, null) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(emailFocus),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onNext = { passwordFocus.requestFocus() }
-                        ),
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BrandPrimary,
-                            unfocusedBorderColor = Color.LightGray
-                        )
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary, unfocusedBorderColor = Color.LightGray)
                     )
-
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-
                 item {
                     OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
+                        value = password, onValueChange = { password = it },
                         label = { Text("Password") },
                         leadingIcon = { Icon(Icons.Default.Lock, null) },
                         visualTransformation = PasswordVisualTransformation(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(passwordFocus),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                viewModel.login(
-                                    email,
-                                    password,
-                                    {
-                                        navController.navigate("main") {
-                                            popUpTo("login") { inclusive = true }
-                                        }
-                                    },
-                                    { err -> Toast.makeText(context, err, Toast.LENGTH_SHORT).show() }
-                                )
-                            }
-                        ),
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BrandPrimary,
-                            unfocusedBorderColor = Color.LightGray
-                        )
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary, unfocusedBorderColor = Color.LightGray)
                     )
-
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
-
                 item {
                     Button(
                         onClick = { viewModel.login(email, password, { navController.navigate("main") { popUpTo("login") { inclusive = true } } }, { err -> Toast.makeText(context, err, Toast.LENGTH_SHORT).show() }) },
@@ -813,26 +844,6 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
     var dlNo by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
-    val storeFocus = remember { FocusRequester() }
-    val dlFocus = remember { FocusRequester() }
-    val addressFocus = remember { FocusRequester() }
-    val nameFocus = remember { FocusRequester() }
-    val phoneFocus = remember { FocusRequester() }
-    val emailFocus = remember { FocusRequester() }
-    val passFocus = remember { FocusRequester() }
-    // Bring-into-view requesters
-    val storeBiv = remember { BringIntoViewRequester() }
-    val dlBiv = remember { BringIntoViewRequester() }
-    val addressBiv = remember { BringIntoViewRequester() }
-    val nameBiv = remember { BringIntoViewRequester() }
-    val phoneBiv = remember { BringIntoViewRequester() }
-    val emailBiv = remember { BringIntoViewRequester() }
-    val passBiv = remember { BringIntoViewRequester() }
-
-// Coroutine scope for scrolling
-    val scope = rememberCoroutineScope()
-
-
     val isLoading by viewModel.isLoading.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
 
@@ -851,196 +862,25 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
                 }
                 item {
                     SectionHeader("Store Details")
-                    OutlinedTextField(
-                        value = store,
-                        onValueChange = { store = it },
-                        label = { Text("Pharmacy / Store Name") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(storeFocus)
-                            .focusRequester(storeFocus)
-                            .bringIntoViewRequester(storeBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { storeBiv.bringIntoView() }
-                                }
-                            }
-                        ,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        keyboardActions = KeyboardActions(
-                            onNext = { dlFocus.requestFocus() }
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
+                    OutlinedTextField(value = store, onValueChange = { store = it }, label = { Text("Pharmacy / Store Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = dlNo,
-                        onValueChange = { dlNo = it },
-                        label = { Text("Drug License No.") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(dlFocus)
-                            .focusRequester(dlFocus)
-                            .bringIntoViewRequester(dlBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { dlBiv.bringIntoView() }
-                                }
-                            }
-                        ,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        keyboardActions = KeyboardActions(
-                            onNext = { addressFocus.requestFocus() }
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
+                    OutlinedTextField(value = dlNo, onValueChange = { dlNo = it }, label = { Text("Drug License No.") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = address,
-                        onValueChange = { address = it },
-                        label = { Text("Full Store Address") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(addressFocus)
-                            .focusRequester(addressFocus)
-                            .bringIntoViewRequester(addressBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { addressBiv.bringIntoView() }
-                                }
-                            }
-                        ,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        keyboardActions = KeyboardActions(
-                            onNext = { nameFocus.requestFocus() }
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        minLines = 2
-                    )
-
+                    OutlinedTextField(value = address, onValueChange = { address = it }, label = { Text("Full Store Address") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), minLines = 2)
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     SectionHeader("Owner Information")
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Owner Full Name") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(nameFocus)
-                            .focusRequester(nameFocus)
-                            .bringIntoViewRequester(nameBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { nameBiv.bringIntoView() }
-                                }
-                            }
-                        ,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        keyboardActions = KeyboardActions(
-                            onNext = { phoneFocus.requestFocus() }
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
+                    OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Owner Full Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = phone,
-                        onValueChange = { phone = it },
-                        label = { Text("Mobile Number") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(phoneFocus)
-                            .focusRequester(phoneFocus)
-                            .bringIntoViewRequester(phoneBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { phoneBiv.bringIntoView() }
-                                }
-                            }
-                        ,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Phone,
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onNext = { emailFocus.requestFocus() }
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
+                    OutlinedTextField(value = phone, onValueChange = { phone = it }, label = { Text("Mobile Number") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Email Address") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(emailFocus)
-                            .focusRequester(emailFocus)
-                            .bringIntoViewRequester(emailBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { emailBiv.bringIntoView() }
-                                }
-                            }
-                        ,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onNext = { passFocus.requestFocus() }
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
+                    OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email Address") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     SectionHeader("Security")
-                    OutlinedTextField(
-                        value = pass,
-                        onValueChange = { pass = it },
-                        label = { Text("Create Password") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(passFocus).focusRequester(passFocus)
-                            .bringIntoViewRequester(passBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { passBiv.bringIntoView() }
-                                }
-                            }
-                        ,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                viewModel.signup(
-                                    name,
-                                    store,
-                                    email,
-                                    phone,
-                                    address,
-                                    dlNo,
-                                    pass
-                                ) {
-                                    navController.navigate("main") {
-                                        popUpTo("onboarding") { inclusive = true }
-                                    }
-                                }
-                            }
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
+                    OutlinedTextField(value = pass, onValueChange = { pass = it }, label = { Text("Create Password") }, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
                     Spacer(modifier = Modifier.height(32.dp))
                 }
                 item {
@@ -1299,323 +1139,34 @@ fun InventoryTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddStockTab(viewModel: ShopViewModel, onAdded: () -> Unit, onOpenDrawer: () -> Unit) {
-    // Focus requesters
-    val nameFocus = remember { FocusRequester() }
-    val categoryFocus = remember { FocusRequester() }
-    val shortIdFocus = remember { FocusRequester() }
-    val batchFocus = remember { FocusRequester() }
-    val saltFocus = remember { FocusRequester() }
-    val qtyFocus = remember { FocusRequester() }
-    val expiryFocus = remember { FocusRequester() }
-    val costFocus = remember { FocusRequester() }
-    val mrpFocus = remember { FocusRequester() }
-    val dealerFocus = remember { FocusRequester() }
-
-
-
-
-// Bring-into-view requesters
-    val nameBiv = remember { BringIntoViewRequester() }
-    val shortIdBiv = remember { BringIntoViewRequester() }
-    val batchBiv = remember { BringIntoViewRequester() }
-    val saltBiv = remember { BringIntoViewRequester() }
-    val qtyBiv = remember { BringIntoViewRequester() }
-    val expiryBiv = remember { BringIntoViewRequester() }
-    val costBiv = remember { BringIntoViewRequester() }
-    val mrpBiv = remember { BringIntoViewRequester() }
-    val dealerBiv = remember { BringIntoViewRequester() }
-
-    val scope = rememberCoroutineScope()
-
-    val apiResults by viewModel.apiResults.collectAsState()
-    val isApiLoading by viewModel.isApiLoading.collectAsState()
-    val dealers by viewModel.dealers.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
     var name by remember { mutableStateOf("") }
-    var salt by remember { mutableStateOf("") }
-    var shortId by remember { mutableStateOf("") }
-    var batch by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var selectedDealer by remember { mutableStateOf<Dealer?>(null) }
     var qty by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
     var mrp by remember { mutableStateOf("") }
     var expiry by remember { mutableStateOf("") }
-    var showApiDropdown by remember { mutableStateOf(false) }
-    var showCat by remember { mutableStateOf(false) }
-    var showDeal by remember { mutableStateOf(false) }
-    var isRestockMode by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val unitLabel = if(category.isNotEmpty()) CategoryUtils.getUnit(category) else "Units"
-    val medicines by viewModel.medicinesFlow.collectAsState()
-    val localMatches = if (name.length > 1) { medicines.filter { it.name.contains(name, ignoreCase = true) } } else emptyList()
 
     Column(modifier = Modifier.fillMaxSize().background(BrandBackground)) {
-        TopAppBar(title = { Text(if(isRestockMode) "Restock Item" else Strings.get("add_new", lang), fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface))
+        TopAppBar(title = { Text(Strings.get("add_new", lang), fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface))
         LazyColumn(Modifier.padding(16.dp)) {
             item {
-                SectionHeader("Smart Search")
-                Box {
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Name") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(nameFocus)
-                            .bringIntoViewRequester(nameBiv)
-                            .onFocusChanged {
-                                if (it.isFocused) {
-                                    scope.launch { nameBiv.bringIntoView() }
-                                }
-                            },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        keyboardActions = KeyboardActions(
-                            onNext = { shortIdFocus.requestFocus() }
-                        ),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BrandPrimary
-                        )
-                    )
-
-                    if (showApiDropdown && (localMatches.isNotEmpty() || apiResults.isNotEmpty())) {
-                        Card(modifier = Modifier.padding(top=56.dp).heightIn(max=250.dp), colors = CardDefaults.cardColors(containerColor = BrandSurface), elevation = CardDefaults.cardElevation(8.dp)) {
-                            LazyColumn {
-                                if(localMatches.isNotEmpty()) {
-                                    item { Text("In Your Inventory", style = MaterialTheme.typography.labelSmall, color = BrandPrimary, modifier = Modifier.padding(8.dp).background(BrandBackground).fillMaxWidth()) }
-                                    items(localMatches) { item -> Row(Modifier.fillMaxWidth().clickable { name = item.name; salt = item.saltName; shortId = item.shortId; category = item.category; mrp = item.sellingPrice.toString(); cost = item.purchasePrice.toString(); isRestockMode = true; showApiDropdown = false; Toast.makeText(context, "Existing item details loaded!", Toast.LENGTH_SHORT).show() }.padding(12.dp)) { Icon(Icons.Default.Inventory, null, tint = WarningOrange, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(item.name, fontWeight = FontWeight.Bold) } }
-                                }
-                                if(apiResults.isNotEmpty()) {
-                                    item { Text("Global Database", style = MaterialTheme.typography.labelSmall, color = BrandTextLight, modifier = Modifier.padding(8.dp).background(BrandBackground).fillMaxWidth()) }
-                                    items(apiResults) { res -> Row(Modifier.fillMaxWidth().clickable { name = res.name; salt = res.salt; shortId = res.defaultShortId; category = res.defaultCategory; isRestockMode = false; showApiDropdown = false; viewModel.clearApiResults() }.padding(12.dp)) { Icon(Icons.Default.Public, null, tint = Color.Gray, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(res.name, fontWeight = FontWeight.Bold) } }
-                                }
-                            }
-                        }
-                    }
-                }
-
                 SectionHeader("Product Info")
                 Card(colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(16.dp)) {
                     Column(Modifier.padding(16.dp)) {
-                        Box {
-                            OutlinedTextField(value = category, onValueChange = {}, readOnly = true, label = { Text("Category") }, modifier = Modifier.fillMaxWidth(), trailingIcon = { IconButton(onClick = { showCat = true }) { Icon(Icons.Default.ArrowDropDown, null) } }, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
-                            DropdownMenu(expanded = showCat, onDismissRequest = { showCat = false }, modifier = Modifier.background(BrandSurface)) { CategoryUtils.categories.forEach { c -> DropdownMenuItem(text = { Text(c.name) }, onClick = { category = c.name; showCat = false }) } }
-                        }
+                        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp))
-                        {
-                            OutlinedTextField(
-                                value = shortId,
-                                onValueChange = { shortId = it.uppercase() },
-                                label = { Text("Short ID") },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .focusRequester(shortIdFocus)
-                                    .bringIntoViewRequester(shortIdBiv)
-                                    .onFocusChanged {
-                                        if (it.isFocused) {
-                                            scope.launch { shortIdBiv.bringIntoView() }
-                                        }
-                                    },
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                                keyboardActions = KeyboardActions(
-                                    onNext = { batchFocus.requestFocus() }
-                                ),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = BrandPrimary
-                                )
-                            )
-
-
-                            OutlinedTextField(
-                                value = batch,
-                                onValueChange = { batch = it.uppercase() },
-                                label = { Text("Batch No") },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .focusRequester(batchFocus)
-                                    .bringIntoViewRequester(batchBiv)
-                                    .onFocusChanged {
-                                        if (it.isFocused) {
-                                            scope.launch { batchBiv.bringIntoView() }
-                                        }
-                                    },
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                                keyboardActions = KeyboardActions(
-                                    onNext = { saltFocus.requestFocus() }
-                                ),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = BrandPrimary
-                                )
-                            )
-                        }
-                            Spacer(Modifier.height(12.dp))
-                        OutlinedTextField(
-                            value = salt,
-                            onValueChange = { salt = it },
-                            label = { Text("Salt Composition") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .focusRequester(saltFocus)
-                                .bringIntoViewRequester(saltBiv)
-                                .onFocusChanged {
-                                    if (it.isFocused) {
-                                        scope.launch { saltBiv.bringIntoView() }
-                                    }
-                                },
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                            keyboardActions = KeyboardActions(
-                                onNext = { qtyFocus.requestFocus() }
-                            ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = BrandPrimary
-                            )
-                        )
-
-                    }
-                }
-
-                SectionHeader("Stock & Supplier")
-                Card(colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(16.dp)) {
-                    Column(Modifier.padding(16.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp))
-                        { OutlinedTextField(
-                            value = qty,
-                            onValueChange = { qty = it },
-                            label = { Text("Qty ($unitLabel)") },
-                            modifier = Modifier
-                                .weight(1f)
-                                .focusRequester(qtyFocus)
-                                .bringIntoViewRequester(qtyBiv)
-                                .onFocusChanged {
-                                    if (it.isFocused) {
-                                        scope.launch { qtyBiv.bringIntoView() }
-                                    }
-                                },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onNext = { expiryFocus.requestFocus() }
-                            ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = BrandPrimary
-                            )
-                        )
-
-                            OutlinedTextField(
-                                value = expiry,
-                                onValueChange = { expiry = it },
-                                label = { Text("Exp (MM/YY)") },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .focusRequester(expiryFocus)
-                                    .bringIntoViewRequester(expiryBiv)
-                                    .onFocusChanged {
-                                        if (it.isFocused) {
-                                            scope.launch { expiryBiv.bringIntoView() }
-                                        }
-                                    },
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                                keyboardActions = KeyboardActions(
-                                    onNext = { costFocus.requestFocus() }
-                                ),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = BrandPrimary
-                                )
-                            )
-                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = qty, onValueChange = { qty = it }, label = { Text("Qty") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)); OutlinedTextField(value = expiry, onValueChange = { expiry = it }, label = { Text("Exp (MM/YY)") }, modifier = Modifier.weight(1f)) }
                         Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp))
-                        { OutlinedTextField(
-                            value = cost,
-                            onValueChange = { cost = it },
-                            label = { Text("Buy Rate") },
-                            modifier = Modifier
-                                .weight(1f)
-                                .focusRequester(costFocus)
-                                .bringIntoViewRequester(costBiv)
-                                .onFocusChanged {
-                                    if (it.isFocused) {
-                                        scope.launch { costBiv.bringIntoView() }
-                                    }
-                                },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onNext = { mrpFocus.requestFocus() }
-                            ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = BrandPrimary
-                            )
-                        )
-
-                            OutlinedTextField(
-                                value = mrp,
-                                onValueChange = { mrp = it },
-                                label = { Text("MRP") },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .focusRequester(mrpFocus)
-                                    .bringIntoViewRequester(mrpBiv)
-                                    .onFocusChanged {
-                                        if (it.isFocused) {
-                                            scope.launch { mrpBiv.bringIntoView() }
-                                        }
-                                    },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                    imeAction = ImeAction.Next
-                                ),
-                                keyboardActions = KeyboardActions(
-                                    onNext = { dealerFocus.requestFocus() }
-                                ),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = BrandPrimary
-                                )
-                            )
-
-                        }
-                        Spacer(Modifier.height(12.dp))
-                        Box {
-                            OutlinedTextField(
-                                value = selectedDealer?.agencyName?:"",
-                                onValueChange = {}, readOnly = true,
-                                label = { Text("Supplier") },
-                                modifier = Modifier.fillMaxWidth().focusRequester(dealerFocus)
-                                    .bringIntoViewRequester(dealerBiv)
-                                    .onFocusChanged {
-                                        if (it.isFocused) {
-                                            scope.launch { dealerBiv.bringIntoView() }
-                                            showDeal = true
-                                        }
-                                    },
-                                trailingIcon = {
-                                    IconButton(onClick = { showDeal = true }) { Icon(Icons.Default.ArrowDropDown, null) } },
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = BrandPrimary
-                                )
-                            )
-                            DropdownMenu(
-                                expanded = showDeal,
-                                onDismissRequest = { showDeal = false },
-                                modifier = Modifier.background(BrandSurface)) {
-                                dealers.forEach { d ->
-                                    DropdownMenuItem(
-                                        text = { Text(d.agencyName) },
-                                        onClick = {
-                                            selectedDealer = d;
-                                            showDeal = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text("Buy Rate") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)); OutlinedTextField(value = mrp, onValueChange = { mrp = it }, label = { Text("MRP") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)) }
                         Spacer(Modifier.height(24.dp))
-                        Button(onClick = { if(name.isNotEmpty()) { viewModel.addStock(Medicine(shortId = shortId, name = name, batchNo = batch, saltName = salt, category = category.ifBlank { "General" }, quantity = qty.toIntOrNull()?:0, purchasePrice = cost.toDoubleOrNull()?:0.0, sellingPrice = mrp.toDoubleOrNull()?:0.0, gstPercent = 12.0, expiryDate = expiry, dealerId = selectedDealer?.id?:"")); Toast.makeText(context, if(isRestockMode) "Stock Updated!" else "Added!", Toast.LENGTH_SHORT).show(); onAdded() } }, modifier = Modifier.fillMaxWidth().height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isRestockMode) WarningOrange else BrandPrimary), shape = RoundedCornerShape(12.dp)) { Text(if(isRestockMode) "UPDATE STOCK" else Strings.get("save_inventory", lang)) }
+                        Button(onClick = {
+                            if(name.isNotEmpty()) {
+                                viewModel.addStock(Medicine(name = name, quantity = qty.toIntOrNull()?:0, purchasePrice = cost.toDoubleOrNull()?:0.0, sellingPrice = mrp.toDoubleOrNull()?:0.0, expiryDate = expiry))
+                                Toast.makeText(context, "Added!", Toast.LENGTH_SHORT).show()
+                                onAdded()
+                            }
+                        }, modifier = Modifier.fillMaxWidth().height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary), shape = RoundedCornerShape(12.dp)) { Text(Strings.get("save_inventory", lang)) }
                     }
                 }
             }
@@ -1659,26 +1210,41 @@ fun TransactionsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
     val bills by viewModel.billsFlow.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
     var selectedBill by remember { mutableStateOf<Bill?>(null) }
-    if (selectedBill != null) { ReceiptDialog(selectedBill!!) { selectedBill = null } }
+
+    if (selectedBill != null) {
+        ReceiptDialog(bill = selectedBill!!, onDismiss = { selectedBill = null })
+    }
 
     Column(modifier = Modifier.fillMaxSize().background(BrandBackground)) {
-        TopAppBar(title = { Text(Strings.get("history", lang), fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface))
+        TopAppBar(
+            title = { Text(Strings.get("history", lang), fontWeight = FontWeight.Bold) },
+            navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface)
+        )
         LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(bills) { bill ->
-                Card(modifier = Modifier.fillMaxWidth().clickable { selectedBill = bill }, colors = CardDefaults.cardColors(containerColor = BrandSurface), elevation = CardDefaults.cardElevation(2.dp)) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { selectedBill = bill },
+                    colors = CardDefaults.cardColors(containerColor = BrandSurface),
+                    elevation = CardDefaults.cardElevation(2.dp)
+                ) {
                     Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Column { Text("Bill #${bill.id}", fontWeight = FontWeight.Bold); Text(bill.customerName, fontSize = 12.sp, color = BrandTextLight) }
-                        Column(horizontalAlignment = Alignment.End) { Text("₹${String.format("%.2f", bill.totalAmount)}", fontWeight = FontWeight.Bold, color = BrandPrimary); Text(SimpleDateFormat("dd MMM", Locale.getDefault()).format(bill.date), fontSize = 12.sp, color = BrandTextLight) }
+                        Column {
+                            Text("Bill #${bill.id}", fontWeight = FontWeight.Bold)
+                            Text(bill.customerName, fontSize = 12.sp, color = BrandTextLight)
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text("₹${String.format("%.2f", bill.totalAmount)}", fontWeight = FontWeight.Bold, color = BrandPrimary)
+                            val date = Date(bill.date)
+                            Text(SimpleDateFormat("dd MMM", Locale.getDefault()).format(date), fontSize = 12.sp, color = BrandTextLight)
+                        }
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun ReceiptDialog(x0: Bill, content: @Composable () -> Unit) {
-    TODO("Not yet implemented")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1703,3 +1269,155 @@ fun ReportsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 
 @Composable fun SectionHeader(title: String) { Text(text = title, style = MaterialTheme.typography.labelLarge, color = BrandPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp, top = 16.dp, start = 4.dp)) }
 @Composable fun StatsCard(title: String, value: String, color: Color, icon: ImageVector, modifier: Modifier) { Card(modifier, colors = CardDefaults.cardColors(containerColor = BrandSurface), elevation = CardDefaults.cardElevation(2.dp)) { Column(Modifier.padding(16.dp)) { Icon(icon, null, tint = color); Spacer(Modifier.height(12.dp)); Text(value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = BrandTextDark); Text(title, fontSize = 12.sp, color = BrandTextLight) } } }
+
+// --- UTILS FOR PDF & DIALOG ---
+
+fun saveBillAsPdf(context: Context, bill: Bill) {
+    try {
+        // Use FULLY QUALIFIED NAME to avoid "interface does not have constructors" error
+        // caused by conflicts with other libraries or stubbed SDKs
+        val pdfDocument = android.graphics.pdf.PdfDocument()
+
+        // Page size: 300 points wide (approx 4 inches), 600 points tall
+        val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(300, 600, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+        val paint = Paint()
+
+        // Header
+        paint.textSize = 12f
+        paint.color = android.graphics.Color.BLACK
+        paint.typeface = Typeface.DEFAULT_BOLD
+        var y = 20f
+
+        paint.textSize = 16f
+        canvas.drawText("MEDFLOW PHARMACY", 50f, y, paint)
+        y += 25f
+
+        // Bill Info
+        paint.textSize = 12f
+        paint.typeface = Typeface.DEFAULT
+        canvas.drawText("Bill #${bill.id}", 10f, y, paint)
+        y += 15f
+
+        val date = Date(bill.date)
+        canvas.drawText("Date: ${SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault()).format(date)}", 10f, y, paint)
+        y += 15f
+        canvas.drawText("Customer: ${bill.customerName}", 10f, y, paint)
+        y += 20f
+
+        // Divider
+        canvas.drawLine(10f, y, 290f, y, paint)
+        y += 15f
+
+        // Items
+        bill.items.forEach { item ->
+            val name = if (item.medicine.name.length > 20) item.medicine.name.substring(0, 17) + "..." else item.medicine.name
+            canvas.drawText("${item.qty} x $name", 10f, y, paint)
+            canvas.drawText(String.format("%.2f", item.totalAmount), 220f, y, paint)
+            y += 15f
+        }
+
+        // Divider
+        y += 5f
+        canvas.drawLine(10f, y, 290f, y, paint)
+        y += 20f
+
+        // Total
+        paint.typeface = Typeface.DEFAULT_BOLD
+        paint.textSize = 14f
+        canvas.drawText("Total: ₹${String.format("%.2f", bill.totalAmount)}", 10f, y, paint)
+
+        pdfDocument.finishPage(page)
+
+        // Save to Downloads
+        val resolver = context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "Bill_${bill.id}_${System.currentTimeMillis()}.pdf")
+            put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+
+        val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
+        if (uri != null) {
+            resolver.openOutputStream(uri)?.use { outputStream ->
+                pdfDocument.writeTo(outputStream)
+            }
+            Toast.makeText(context, "Saved PDF to Downloads", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(context, "Error creating file", Toast.LENGTH_SHORT).show()
+        }
+        pdfDocument.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+    }
+}
+
+@Composable
+fun ReceiptDialog(bill: Bill, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+            colors = CardDefaults.cardColors(containerColor = BrandSurface),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(Icons.Default.CheckCircle, null, tint = BrandPrimary, modifier = Modifier.size(48.dp))
+                Spacer(Modifier.height(16.dp))
+
+                Text("Transaction Details", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Bill #${bill.id}", color = BrandTextLight, fontSize = 14.sp)
+                Spacer(Modifier.height(24.dp))
+
+                // Items List (Scrollable)
+                LazyColumn(modifier = Modifier.heightIn(max = 200.dp).fillMaxWidth()) {
+                    items(bill.items) { item ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("${item.qty} x ${item.medicine.name}", fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
+                            Text("₹${String.format("%.2f", item.totalAmount)}", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+                        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Grand Total", fontWeight = FontWeight.Bold)
+                    Text("₹${String.format("%.2f", bill.totalAmount)}", fontWeight = FontWeight.Bold, color = BrandPrimary)
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Button(
+                    onClick = { saveBillAsPdf(context, bill) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
+                ) {
+                    Icon(Icons.Default.Download, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("DOWNLOAD PDF")
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                OutlinedButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("CLOSE")
+                }
+            }
+        }
+    }
+}
