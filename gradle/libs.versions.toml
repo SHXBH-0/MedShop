@@ -12,6 +12,8 @@ composeBom = "2024.09.00"
 googleServices = "4.4.4"
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.6"
+pdfViewer = "1.0.0-alpha12"
+foundationLayout = "1.10.1"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -34,6 +36,8 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-pdf-viewer = { group = "androidx.pdf", name = "pdf-viewer", version.ref = "pdfViewer" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
