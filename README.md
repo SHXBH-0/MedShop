@@ -1,6 +1,6 @@
 💊 Pill Point - Intelligent Pharmacy Operations Platform
 
-"Prescribing Efficiency for Modern Pharmacies."
+"Beyound Your Counter"
 
 📖 Overview
 
@@ -46,7 +46,7 @@ Supplier Directory: Direct "Click-to-Call" functionality and centralized dealer 
 
 📊 Insightful Dashboard: Real-time view of daily revenue, recent transactions, and critical stock alerts.
 
-🌍 Multilingual: Available in English, Hindi, Marathi, and Tamil.
+🌍 Multilingual: Available in English, Hindi, Marathi.
 
 🛠️ Tech Stack
 
@@ -78,7 +78,7 @@ Installation
 
 Clone the repository:
 
-git clone [https://github.com/your-username/PillPoint.git](https://github.com/your-username/PillPoint.git)
+git clone [[https://github.com/your-username/PillPoint.git](https://github.com/SHXBH-0/MedShop.git)]
 
 
 
@@ -114,13 +114,13 @@ $$$$
 
  Expiry date push notifications.
 
-$$$$
-
- GST Return report generation.
 
 👥 Contributors
 
 Rijul Samaiya - Lead Developer
+Shubh Jain - Backend Developer
+Rupesh panda - Frontend Developer
+Shreya Bhagat - Research & Analysis
 
 📄 License
 
