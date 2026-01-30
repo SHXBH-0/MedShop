@@ -163,35 +163,34 @@ import java.util.UUID
 enum class AppLanguage(val code: String, val displayName: String) {
     ENGLISH("en", "English"),
     HINDI("hi", "हिंदी"),
-    MARATHI("mr", "मराठी"),
-    TAMIL("ta", "தமிழ்")
+    MARATHI("mr", "मराठी")
 }
 
 object Strings {
     private val dictionary = mapOf(
-        "app_name" to mapOf(AppLanguage.ENGLISH to "MedFlow Pro", AppLanguage.HINDI to "मेडफ्लो प्रो", AppLanguage.MARATHI to "मेडफ्लो प्रो", AppLanguage.TAMIL to "மெட்ஃப்ளோ ப்ரோ"),
-        "onboarding_welcome" to mapOf(AppLanguage.ENGLISH to "Manage Pharmacy Smartly", AppLanguage.HINDI to "फार्मेसी का स्मार्ट प्रबंधन", AppLanguage.MARATHI to "फार्मसीचे स्मार्ट व्यवस्थापन", AppLanguage.TAMIL to "மருந்தகத்தை நிர்வகிக்கவும்"),
-        "onboarding_tagline" to mapOf(AppLanguage.ENGLISH to "Billing, Inventory & Dealers in one place.", AppLanguage.HINDI to "बिलिंग, इन्वेंटरी और विक्रेता एक ही जगह।", AppLanguage.MARATHI to "बिलिंग, साठा आणि विक्रेते एकाच ठिकाणी.", AppLanguage.TAMIL to "பில்லிங் மற்றும் சரக்கு மேலாண்மை."),
-        "get_started" to mapOf(AppLanguage.ENGLISH to "Get Started", AppLanguage.HINDI to "शुरू करें", AppLanguage.MARATHI to "सुरु करा", AppLanguage.TAMIL to "தொடங்குங்கள்"),
-        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन", AppLanguage.TAMIL to "உள்நுழைய"),
-        "login_title" to mapOf(AppLanguage.ENGLISH to "Welcome Back", AppLanguage.HINDI to "स्वागत हे", AppLanguage.MARATHI to "स्वागत आहे", AppLanguage.TAMIL to "வரவேற்கிறோம்"),
-        "login_subtitle" to mapOf(AppLanguage.ENGLISH to "Sign in to manage your pharmacy", AppLanguage.HINDI to "अपनी फार्मेसी का प्रबंधन करने के लिए साइन इन करें", AppLanguage.MARATHI to "तुमची फार्मसी व्यवस्थापित करण्यासाठी साइन इन करा", AppLanguage.TAMIL to "உங்கள் மருந்தகத்தை நிர்வகிக்க உள்நுழையவும்"),
-        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा", AppLanguage.TAMIL to "கணக்கை உருவாக்கு"),
-        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड", AppLanguage.TAMIL to "முகப்பு"),
-        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा", AppLanguage.TAMIL to "சரக்கு"),
-        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा", AppLanguage.TAMIL to "சரக்கு சேர்"),
-        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते", AppLanguage.TAMIL to "வியாபாரிகள்"),
-        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा...", AppLanguage.TAMIL to "தேடு..."),
-        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला", AppLanguage.TAMIL to "கையிருப்பு இல்லை"),
-        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक", AppLanguage.TAMIL to "குறைவு"),
-        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री", AppLanguage.TAMIL to "விற்பனை"),
-        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार", AppLanguage.TAMIL to "சமீபத்திய பரிவர்த்தனைகள்"),
-        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल", AppLanguage.TAMIL to "மொத்த ரசீது"),
-        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा", AppLanguage.TAMIL to "ரசீது உருவாக்கு"),
-        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा", AppLanguage.TAMIL to "சேமி"),
-        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास", AppLanguage.TAMIL to "வரலாறு"),
-        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल", AppLanguage.TAMIL to "அறிக்கைகள்"),
-        "view_all" to mapOf(AppLanguage.ENGLISH to "View All", AppLanguage.HINDI to "सभी देखें", AppLanguage.MARATHI to "सर्व पहा", AppLanguage.TAMIL to "அனைத்தையும் பார்")
+        "app_name" to mapOf(AppLanguage.ENGLISH to "MedFlow Pro", AppLanguage.HINDI to "मेडफ्लो प्रो", AppLanguage.MARATHI to "मेडफ्लो प्रो"),
+        "onboarding_welcome" to mapOf(AppLanguage.ENGLISH to "Manage Pharmacy Smartly", AppLanguage.HINDI to "फार्मेसी का स्मार्ट प्रबंधन", AppLanguage.MARATHI to "फार्मसीचे स्मार्ट व्यवस्थापन"),
+        "onboarding_tagline" to mapOf(AppLanguage.ENGLISH to "Billing, Inventory & Dealers in one place.", AppLanguage.HINDI to "बिलिंग, इन्वेंटरी और विक्रेता एक ही जगह।", AppLanguage.MARATHI to "बिलिंग, साठा आणि विक्रेते एकाच ठिकाणी."),
+        "get_started" to mapOf(AppLanguage.ENGLISH to "Get Started", AppLanguage.HINDI to "शुरू करें", AppLanguage.MARATHI to "सुरु करा"),
+        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन"),
+        "login_title" to mapOf(AppLanguage.ENGLISH to "Welcome Back", AppLanguage.HINDI to "स्वागत हे", AppLanguage.MARATHI to "स्वागत आहे"),
+        "login_subtitle" to mapOf(AppLanguage.ENGLISH to "Sign in to manage your pharmacy", AppLanguage.HINDI to "अपनी फार्मेसी का प्रबंधन करने के लिए साइन इन करें", AppLanguage.MARATHI to "तुमची फार्मसी व्यवस्थापित करण्यासाठी साइन इन करा"),
+        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा"),
+        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड"),
+        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा"),
+        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा"),
+        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते"),
+        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा..."),
+        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला"),
+        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक"),
+        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री"),
+        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार"),
+        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल"),
+        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा"),
+        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा"),
+        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास"),
+        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल"),
+        "view_all" to mapOf(AppLanguage.ENGLISH to "View All", AppLanguage.HINDI to "सभी देखें", AppLanguage.MARATHI to "सर्व पहा")
     )
 
     fun get(key: String, lang: AppLanguage): String {
