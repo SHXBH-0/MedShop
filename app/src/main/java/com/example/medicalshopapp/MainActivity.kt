@@ -1,5 +1,16 @@
 package com.example.medicalshopapp
 
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
+
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import kotlinx.coroutines.launch
+
 
 import android.content.ContentValues
 import android.content.Context
@@ -77,29 +88,28 @@ import java.util.UUID
 enum class AppLanguage(val code: String, val displayName: String) {
     ENGLISH("en", "English"),
     HINDI("hi", "हिंदी"),
-    MARATHI("mr", "मराठी"),
-    TAMIL("ta", "தமிழ்")
+    MARATHI("mr", "मराठी")
 }
 
 object Strings {
     private val dictionary = mapOf(
-        "app_name" to mapOf(AppLanguage.ENGLISH to "PillPoint", AppLanguage.HINDI to "पिनपॉइंट", AppLanguage.MARATHI to "पिनपॉइंट", AppLanguage.TAMIL to "மெட்ஃப்ளோ"),
-        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन", AppLanguage.TAMIL to "உள்நுழைய"),
-        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा", AppLanguage.TAMIL to "கணக்கை உருவாக்கு"),
-        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड", AppLanguage.TAMIL to "முகப்பு"),
-        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा", AppLanguage.TAMIL to "சரக்கு"),
-        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा", AppLanguage.TAMIL to "சரக்கு சேர்"),
-        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते", AppLanguage.TAMIL to "வியாபாரிகள்"),
-        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा...", AppLanguage.TAMIL to "தேடு..."),
-        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला", AppLanguage.TAMIL to "கையிருப்பு இல்லை"),
-        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक", AppLanguage.TAMIL to "குறைவு"),
-        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री", AppLanguage.TAMIL to "விற்பனை"),
-        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार", AppLanguage.TAMIL to "சமீபத்திய பரிவர்த்தனைகள்"),
-        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल", AppLanguage.TAMIL to "மொத்த ரசீது"),
-        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा", AppLanguage.TAMIL to "ரசீது உருவாக்கு"),
-        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा", AppLanguage.TAMIL to "சேமி"),
-        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास", AppLanguage.TAMIL to "வரலாறு"),
-        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल", AppLanguage.TAMIL to "அறிக்கைகள்")
+        "app_name" to mapOf(AppLanguage.ENGLISH to "PillPoint", AppLanguage.HINDI to "पिनपॉइंट", AppLanguage.MARATHI to "पिनपॉइंट"),
+        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन"),
+        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा"),
+        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड"),
+        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा"),
+        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा"),
+        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते"),
+        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा..."),
+        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला"),
+        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक"),
+        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री"),
+        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार"),
+        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल"),
+        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा"),
+        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा"),
+        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास"),
+        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल")
     )
 
     fun get(key: String, lang: AppLanguage): String {
@@ -676,6 +686,8 @@ fun OnboardingScreen(navController: NavController, viewModel: ShopViewModel) {
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
+    val emailFocus = remember { FocusRequester() }
+    val passwordFocus = remember { FocusRequester() }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val isLoading by viewModel.isLoading.collectAsState()
@@ -700,25 +712,59 @@ fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
                 }
                 item {
                     OutlinedTextField(
-                        value = email, onValueChange = { email = it },
+                        value = email,
+                        onValueChange = { email = it },
                         label = { Text("Email Address") },
                         leadingIcon = { Icon(Icons.Default.Email, null) },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(emailFocus),
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Email
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { passwordFocus.requestFocus() }
+                        ),
                         shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary, unfocusedBorderColor = Color.LightGray)
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = BrandPrimary,
+                            unfocusedBorderColor = Color.LightGray
+                        )
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 item {
                     OutlinedTextField(
-                        value = password, onValueChange = { password = it },
+                        value = password,
+                        onValueChange = { password = it },
                         label = { Text("Password") },
                         leadingIcon = { Icon(Icons.Default.Lock, null) },
                         visualTransformation = PasswordVisualTransformation(),
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(passwordFocus),
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                viewModel.login(
+                                    email,
+                                    password,
+                                    { navController.navigate("main") { popUpTo("login") { inclusive = true } } },
+                                    { err -> Toast.makeText(context, err, Toast.LENGTH_SHORT).show() }
+                                )
+                            }
+                        ),
                         shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary, unfocusedBorderColor = Color.LightGray)
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = BrandPrimary,
+                            unfocusedBorderColor = Color.LightGray
+                        )
                     )
+
                     Spacer(modifier = Modifier.height(32.dp))
                 }
                 item {
@@ -754,6 +800,24 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
     val isLoading by viewModel.isLoading.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val storeFocus = remember { FocusRequester() }
+    val dlFocus = remember { FocusRequester() }
+    val addressFocus = remember { FocusRequester() }
+    val nameFocus = remember { FocusRequester() }
+    val phoneFocus = remember { FocusRequester() }
+    val emailFocus = remember { FocusRequester() }
+    val passFocus = remember { FocusRequester() }
+
+    val storeBiv = remember { BringIntoViewRequester() }
+    val dlBiv = remember { BringIntoViewRequester() }
+    val addressBiv = remember { BringIntoViewRequester() }
+    val nameBiv = remember { BringIntoViewRequester() }
+    val phoneBiv = remember { BringIntoViewRequester() }
+    val emailBiv = remember { BringIntoViewRequester() }
+    val passBiv = remember { BringIntoViewRequester() }
+
 
     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(BrandSecondary, BrandPrimary))), contentAlignment = Alignment.Center) {
         Card(
@@ -769,25 +833,157 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
                 }
                 item {
                     SectionHeader("Store Details")
-                    OutlinedTextField(value = store, onValueChange = { store = it }, label = { Text("Pharmacy / Store Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = store,
+                        onValueChange = { store = it },
+                        label = { Text("Pharmacy / Store Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(storeFocus)
+                            .bringIntoViewRequester(storeBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) scope.launch { storeBiv.bringIntoView() }
+                            },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { dlFocus.requestFocus() }
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = dlNo, onValueChange = { dlNo = it }, label = { Text("Drug License No.") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = dlNo,
+                        onValueChange = { dlNo = it },
+                        label = { Text("Drug License No.") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(dlFocus)
+                            .bringIntoViewRequester(dlBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) scope.launch { dlBiv.bringIntoView() }
+                            },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { addressFocus.requestFocus() }
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = address, onValueChange = { address = it }, label = { Text("Full Store Address") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), minLines = 2)
+                    OutlinedTextField(
+                        value = address,
+                        onValueChange = { address = it },
+                        label = { Text("Full Store Address") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(addressFocus)
+                            .bringIntoViewRequester(addressBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) scope.launch { addressBiv.bringIntoView() }
+                            },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { nameFocus.requestFocus() }
+                        ),
+                        minLines = 2
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     SectionHeader("Owner Information")
-                    OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Owner Full Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Owner Full Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(nameFocus)
+                            .bringIntoViewRequester(nameBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) scope.launch { nameBiv.bringIntoView() }
+                            },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { phoneFocus.requestFocus() }
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = phone, onValueChange = { phone = it }, label = { Text("Mobile Number") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = { phone = it },
+                        label = { Text("Mobile Number") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(phoneFocus)
+                            .bringIntoViewRequester(phoneBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) scope.launch { phoneBiv.bringIntoView() }
+                            },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { emailFocus.requestFocus() }
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email Address") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email Address") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(emailFocus)
+                            .bringIntoViewRequester(emailBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) scope.launch { emailBiv.bringIntoView() }
+                            },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { passFocus.requestFocus() }
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     SectionHeader("Security")
-                    OutlinedTextField(value = pass, onValueChange = { pass = it }, label = { Text("Create Password") }, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+                    OutlinedTextField(
+                        value = pass,
+                        onValueChange = { pass = it },
+                        label = { Text("Create Password") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(passFocus)
+                            .bringIntoViewRequester(passBiv)
+                            .onFocusChanged {
+                                if (it.isFocused) scope.launch { passBiv.bringIntoView() }
+                            },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                viewModel.signup(
+                                    name, store, email, phone, address, dlNo, pass,
+                                    onSuccess = {
+                                        navController.navigate("main") {
+                                            popUpTo("onboarding") { inclusive = true }
+                                        }
+                                    },
+                                    onError = { msg ->
+                                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                    }
+                                )
+                            }
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(32.dp))
                 }
                 item {
