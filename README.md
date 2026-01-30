@@ -78,7 +78,7 @@ Installation
 
 Clone the repository:
 
-git clone [[https://github.com/your-username/PillPoint.git](https://github.com/SHXBH-0/MedShop.git)]
+git clone [[https://github.com/SHXBH-0/PillPoint.git](https://github.com/SHXBH-0/MedShop.git)]
 
 
 
