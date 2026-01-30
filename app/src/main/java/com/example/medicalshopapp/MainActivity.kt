@@ -400,13 +400,20 @@ class ShopViewModel : ViewModel() {
         name: String,
         store: String,
         email: String,
-        phone: String, // Kept for consistency, could store in user doc
+        phone: String,
         address: String,
         dlNo: String,
         pass: String,
-        onSuccess: () -> Unit
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit // <--- ADD THIS PARAMETER
     ) {
+        if (name.isBlank() || store.isBlank() || email.isBlank() || pass.isBlank()) {
+            onError("Please fill all required fields")
+            return
+        }
+
         _isLoading.value = true
+
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -417,7 +424,8 @@ class ShopViewModel : ViewModel() {
                         "email" to email,
                         "phone" to phone,
                         "address" to address,
-                        "dlNo" to dlNo
+                        "dlNo" to dlNo,
+                        "role" to "admin" // Good practice to add roles
                     )
 
                     db.collection("users").document(uid).set(userMap)
@@ -427,8 +435,14 @@ class ShopViewModel : ViewModel() {
                             _isLoading.value = false
                             onSuccess()
                         }
+                        .addOnFailureListener { e ->
+                            _isLoading.value = false
+                            onError("Database Error: ${e.message}")
+                        }
                 } else {
                     _isLoading.value = false
+                    // Pass the actual error message to the UI
+                    onError(task.exception?.message ?: "Signup Failed")
                 }
             }
     }
@@ -838,6 +852,7 @@ fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
 
 @Composable
 fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
+    val context = LocalContext.current
     var name by remember { mutableStateOf("") }
     var store by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -886,7 +901,21 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
                 }
                 item {
                     Button(
-                        onClick = { viewModel.signup(name, store, email, phone, address, dlNo, pass) { navController.navigate("main") { popUpTo("onboarding") { inclusive = true } } } },
+                        onClick = {
+                            viewModel.signup(
+                                name, store, email, phone, address, dlNo, pass,
+                                onSuccess = {
+                                    Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("main") {
+                                        popUpTo("onboarding") { inclusive = true }
+                                    }
+                                },
+                                onError = { errorMessage ->
+                                    // This will now tell you EXACTLY why it failed
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary),
                         shape = RoundedCornerShape(16.dp)
