@@ -696,7 +696,6 @@ fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
                     Box(modifier = Modifier.size(72.dp).background(BrandPrimary.copy(0.1f), CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.LocalPharmacy, null, tint = BrandPrimary, modifier = Modifier.size(40.dp)) }
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(Strings.get("app_name", lang), style = MaterialTheme.typography.headlineLarge)
-                    Text(Strings.get("login_title", lang), style = MaterialTheme.typography.titleMedium, color = BrandTextLight)
                     Spacer(modifier = Modifier.height(32.dp))
                 }
                 item {
@@ -766,7 +765,6 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
             LazyColumn(modifier = Modifier.padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 item {
                     Text(Strings.get("signup_title", lang), style = MaterialTheme.typography.headlineMedium, color = BrandTextDark)
-                    Text("Complete Business Registration", style = MaterialTheme.typography.bodyMedium, color = BrandTextLight, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
