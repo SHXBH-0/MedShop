@@ -1,5 +1,6 @@
 package com.example.medicalshopapp
 
+
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -16,22 +17,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -39,84 +25,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddBox
-import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.ChildCare
-import androidx.compose.material.icons.filled.Contacts
-import androidx.compose.material.icons.filled.ContentCut
-import androidx.compose.material.icons.filled.Dashboard
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Healing
-import androidx.compose.material.icons.filled.HealthAndSafety
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Inventory
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.LocalPharmacy
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.NotificationsActive
-import androidx.compose.material.icons.filled.Opacity
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.Science
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.ShoppingCartCheckout
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.Vaccines
-import androidx.compose.material.icons.filled.WaterDrop
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.Typography
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -131,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -141,6 +53,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -152,6 +65,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -163,34 +77,29 @@ import java.util.UUID
 enum class AppLanguage(val code: String, val displayName: String) {
     ENGLISH("en", "English"),
     HINDI("hi", "हिंदी"),
-    MARATHI("mr", "मराठी")
+    MARATHI("mr", "मराठी"),
+    TAMIL("ta", "தமிழ்")
 }
 
 object Strings {
     private val dictionary = mapOf(
-        "app_name" to mapOf(AppLanguage.ENGLISH to "MedFlow Pro", AppLanguage.HINDI to "मेडफ्लो प्रो", AppLanguage.MARATHI to "मेडफ्लो प्रो"),
-        "onboarding_welcome" to mapOf(AppLanguage.ENGLISH to "Manage Pharmacy Smartly", AppLanguage.HINDI to "फार्मेसी का स्मार्ट प्रबंधन", AppLanguage.MARATHI to "फार्मसीचे स्मार्ट व्यवस्थापन"),
-        "onboarding_tagline" to mapOf(AppLanguage.ENGLISH to "Billing, Inventory & Dealers in one place.", AppLanguage.HINDI to "बिलिंग, इन्वेंटरी और विक्रेता एक ही जगह।", AppLanguage.MARATHI to "बिलिंग, साठा आणि विक्रेते एकाच ठिकाणी."),
-        "get_started" to mapOf(AppLanguage.ENGLISH to "Get Started", AppLanguage.HINDI to "शुरू करें", AppLanguage.MARATHI to "सुरु करा"),
-        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन"),
-        "login_title" to mapOf(AppLanguage.ENGLISH to "Welcome Back", AppLanguage.HINDI to "स्वागत हे", AppLanguage.MARATHI to "स्वागत आहे"),
-        "login_subtitle" to mapOf(AppLanguage.ENGLISH to "Sign in to manage your pharmacy", AppLanguage.HINDI to "अपनी फार्मेसी का प्रबंधन करने के लिए साइन इन करें", AppLanguage.MARATHI to "तुमची फार्मसी व्यवस्थापित करण्यासाठी साइन इन करा"),
-        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा"),
-        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड"),
-        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा"),
-        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा"),
-        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते"),
-        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा..."),
-        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला"),
-        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक"),
-        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री"),
-        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार"),
-        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल"),
-        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा"),
-        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा"),
-        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास"),
-        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल"),
-        "view_all" to mapOf(AppLanguage.ENGLISH to "View All", AppLanguage.HINDI to "सभी देखें", AppLanguage.MARATHI to "सर्व पहा")
+        "app_name" to mapOf(AppLanguage.ENGLISH to "PillPoint", AppLanguage.HINDI to "पिनपॉइंट", AppLanguage.MARATHI to "पिनपॉइंट", AppLanguage.TAMIL to "மெட்ஃப்ளோ"),
+        "login_action" to mapOf(AppLanguage.ENGLISH to "Log In", AppLanguage.HINDI to "लॉगिन", AppLanguage.MARATHI to "लॉगिन", AppLanguage.TAMIL to "உள்நுழைய"),
+        "signup_title" to mapOf(AppLanguage.ENGLISH to "Create Account", AppLanguage.HINDI to "खाता बनाएं", AppLanguage.MARATHI to "खाते तयार करा", AppLanguage.TAMIL to "கணக்கை உருவாக்கு"),
+        "dashboard" to mapOf(AppLanguage.ENGLISH to "Dashboard", AppLanguage.HINDI to "डैशबोर्ड", AppLanguage.MARATHI to "डॅशबोर्ड", AppLanguage.TAMIL to "முகப்பு"),
+        "inventory" to mapOf(AppLanguage.ENGLISH to "Inventory", AppLanguage.HINDI to "इन्वेंटरी", AppLanguage.MARATHI to "साठा", AppLanguage.TAMIL to "சரக்கு"),
+        "add_new" to mapOf(AppLanguage.ENGLISH to "Add Stock", AppLanguage.HINDI to "स्टॉक जोड़ें", AppLanguage.MARATHI to "स्टॉक जोडा", AppLanguage.TAMIL to "சரக்கு சேர்"),
+        "dealers" to mapOf(AppLanguage.ENGLISH to "Suppliers", AppLanguage.HINDI to "विक्रेता", AppLanguage.MARATHI to "विक्रेते", AppLanguage.TAMIL to "வியாபாரிகள்"),
+        "search_hint" to mapOf(AppLanguage.ENGLISH to "Search...", AppLanguage.HINDI to "खोजें...", AppLanguage.MARATHI to "शोधा...", AppLanguage.TAMIL to "தேடு..."),
+        "out_of_stock" to mapOf(AppLanguage.ENGLISH to "OUT OF STOCK", AppLanguage.HINDI to "स्टॉक खत्म", AppLanguage.MARATHI to "स्टॉक संपला", AppLanguage.TAMIL to "கையிருப்பு இல்லை"),
+        "low_stock" to mapOf(AppLanguage.ENGLISH to "LOW STOCK", AppLanguage.HINDI to "कम स्टॉक", AppLanguage.MARATHI to "कमी स्टॉक", AppLanguage.TAMIL to "குறைவு"),
+        "new_sale" to mapOf(AppLanguage.ENGLISH to "Counter Sale", AppLanguage.HINDI to "बिक्री", AppLanguage.MARATHI to "विक्री", AppLanguage.TAMIL to "விற்பனை"),
+        "recent_trans" to mapOf(AppLanguage.ENGLISH to "Recent Transactions", AppLanguage.HINDI to "हाल का लेनदेन", AppLanguage.MARATHI to "अलीकडील व्यवहार", AppLanguage.TAMIL to "சமீபத்திய பரிவர்த்தனைகள்"),
+        "total_bill" to mapOf(AppLanguage.ENGLISH to "Total Bill", AppLanguage.HINDI to "कुल बिल", AppLanguage.MARATHI to "एकूण बिल", AppLanguage.TAMIL to "மொத்த ரசீது"),
+        "generate_invoice" to mapOf(AppLanguage.ENGLISH to "GENERATE INVOICE", AppLanguage.HINDI to "चालान बनाएं", AppLanguage.MARATHI to "बिल तयार करा", AppLanguage.TAMIL to "ரசீது உருவாக்கு"),
+        "save_inventory" to mapOf(AppLanguage.ENGLISH to "SAVE TO INVENTORY", AppLanguage.HINDI to "इन्वेंटरी में सहेजें", AppLanguage.MARATHI to "साठ्यात जतन करा", AppLanguage.TAMIL to "சேமி"),
+        "history" to mapOf(AppLanguage.ENGLISH to "History", AppLanguage.HINDI to "इतिहास", AppLanguage.MARATHI to "इतिहास", AppLanguage.TAMIL to "வரலாறு"),
+        "reports" to mapOf(AppLanguage.ENGLISH to "Reports", AppLanguage.HINDI to "रिपोर्ट", AppLanguage.MARATHI to "अहवाल", AppLanguage.TAMIL to "அறிக்கைகள்")
     )
 
     fun get(key: String, lang: AppLanguage): String {
@@ -234,7 +143,7 @@ data class Dealer(
     val name: String = "",
     val agencyName: String = "",
     val phone: String = "",
-    val userId: String = "" // For multi-user separation
+    val userId: String = ""
 )
 
 data class Medicine(
@@ -264,20 +173,24 @@ data class CartItem(
 data class Bill(
     val id: String = UUID.randomUUID().toString().substring(0, 8).uppercase(),
     val customerName: String = "",
+    val customerPhone: String = "", // Added this field
     val items: List<CartItem> = emptyList(),
     val totalAmount: Double = 0.0,
     val totalTax: Double = 0.0,
-    val date: Long = System.currentTimeMillis(), // Firestore prefers Long/Timestamp
+    val date: Long = System.currentTimeMillis(),
     val userId: String = ""
 )
 
 data class User(val uid: String, val email: String, val storeName: String)
 
-// --- 3. VIEWMODEL WITH FIREBASE INTEGRATION ---
+// --- 3. VIEWMODEL ---
 
 class ShopViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    // !!! REPLACE WITH YOUR ACTUAL API KEY !!!
+    private val GEMINI_API_KEY = "AIzaSyDTlSVpIgUOHb802slOXygVuzYyIGa-KBc"
 
     private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
     val medicinesFlow: StateFlow<List<Medicine>> = _medicines.asStateFlow()
@@ -294,7 +207,7 @@ class ShopViewModel : ViewModel() {
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(true) // Start loading for auth check
+    private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _todaysSales = MutableStateFlow(0.0)
@@ -313,10 +226,8 @@ class ShopViewModel : ViewModel() {
     val currentLanguage: StateFlow<AppLanguage> = _currentLanguage.asStateFlow()
 
     init {
-        // Check for existing session
         val currentAuthUser = auth.currentUser
         if (currentAuthUser != null) {
-            // Fetch User Details
             db.collection("users").document(currentAuthUser.uid).get()
                 .addOnSuccessListener { document ->
                     if (document != null) {
@@ -327,33 +238,31 @@ class ShopViewModel : ViewModel() {
                     }
                     _isLoading.value = false
                 }
-                .addOnFailureListener { _isLoading.value = false }
+                .addOnFailureListener {
+                    _isLoading.value = false
+                    Log.e("ShopViewModel", "Failed to fetch user: ${it.message}")
+                }
         } else {
             _isLoading.value = false
         }
     }
 
     private fun startListeners(uid: String) {
-        // Listen to Medicines
         db.collection("medicines").whereEqualTo("userId", uid)
-            .addSnapshotListener { value, _ ->
-                if (value != null) {
-                    val list = value.toObjects(Medicine::class.java)
-                    _medicines.value = list
-                }
+            .addSnapshotListener { value, e ->
+                if (e != null) { Log.e("ShopViewModel", "Listen failed.", e); return@addSnapshotListener }
+                if (value != null) { _medicines.value = value.toObjects(Medicine::class.java) }
             }
 
-        // Listen to Dealers
         db.collection("dealers").whereEqualTo("userId", uid)
-            .addSnapshotListener { value, _ ->
-                if (value != null) {
-                    _dealers.value = value.toObjects(Dealer::class.java)
-                }
+            .addSnapshotListener { value, e ->
+                if (e != null) return@addSnapshotListener
+                if (value != null) { _dealers.value = value.toObjects(Dealer::class.java) }
             }
 
-        // Listen to Bills
         db.collection("bills").whereEqualTo("userId", uid)
-            .addSnapshotListener { value, _ ->
+            .addSnapshotListener { value, e ->
+                if (e != null) return@addSnapshotListener
                 if (value != null) {
                     val list = value.toObjects(Bill::class.java).sortedByDescending { it.date }
                     _bills.value = list
@@ -388,6 +297,9 @@ class ShopViewModel : ViewModel() {
                         startListeners(uid)
                         _isLoading.value = false
                         onS()
+                    }.addOnFailureListener {
+                        _isLoading.value = false
+                        onE("DB Error: ${it.message}")
                     }
                 } else {
                     _isLoading.value = false
@@ -405,28 +317,16 @@ class ShopViewModel : ViewModel() {
         dlNo: String,
         pass: String,
         onSuccess: () -> Unit,
-        onError: (String) -> Unit // <--- ADD THIS PARAMETER
+        onError: (String) -> Unit // ADDED ERROR CALLBACK
     ) {
-        if (name.isBlank() || store.isBlank() || email.isBlank() || pass.isBlank()) {
-            onError("Please fill all required fields")
-            return
-        }
-
+        if(email.isBlank() || pass.isBlank()) { onError("Email/Pass required"); return }
         _isLoading.value = true
 
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val uid = auth.currentUser!!.uid
-                    val userMap = hashMapOf(
-                        "name" to name,
-                        "storeName" to store,
-                        "email" to email,
-                        "phone" to phone,
-                        "address" to address,
-                        "dlNo" to dlNo,
-                        "role" to "admin" // Good practice to add roles
-                    )
+                    val userMap = hashMapOf("name" to name, "storeName" to store, "email" to email, "phone" to phone, "address" to address, "dlNo" to dlNo)
 
                     db.collection("users").document(uid).set(userMap)
                         .addOnSuccessListener {
@@ -435,14 +335,13 @@ class ShopViewModel : ViewModel() {
                             _isLoading.value = false
                             onSuccess()
                         }
-                        .addOnFailureListener { e ->
+                        .addOnFailureListener {
                             _isLoading.value = false
-                            onError("Database Error: ${e.message}")
+                            onError("Database save failed: ${it.message}")
                         }
                 } else {
                     _isLoading.value = false
-                    // Pass the actual error message to the UI
-                    onError(task.exception?.message ?: "Signup Failed")
+                    onError(task.exception?.message ?: "Signup failed")
                 }
             }
     }
@@ -456,78 +355,87 @@ class ShopViewModel : ViewModel() {
     }
 
     fun addStock(m: Medicine) {
+
         val uid = _currentUser.value?.uid ?: return
+
         val newMed = m.copy(userId = uid)
-        // If updating existing stock, logic would differ slightly (using document ID)
-        // For now, simpler implementation:
+
+// If updating existing stock, logic would differ slightly (using document ID)
+
+// For now, simpler implementation:
+
         viewModelScope.launch(Dispatchers.IO) {
+
             val existing = _medicines.value.find { it.name.equals(m.name, true) && it.batchNo == m.batchNo }
+
             if (existing != null) {
-                // Update quantity
+
+// Update quantity
+
                 db.collection("medicines").document(existing.id)
+
                     .update("quantity", existing.quantity + m.quantity)
+
             } else {
-                // Create new
+
+// Create new
+
                 db.collection("medicines").document(newMed.id).set(newMed)
+
             }
+
         }
+
     }
+    fun deleteMedicine(id: String) {
+        db.collection("medicines").document(id).delete()
+    }
+
+
 
     fun addDealer(n: String, a: String, p: String) {
         val uid = _currentUser.value?.uid ?: return
         val dealer = Dealer(name = n, agencyName = a, phone = p, userId = uid)
         db.collection("dealers").document(dealer.id).set(dealer)
     }
-
-
-    private val GEMINI_API_KEY = "AIzaSyB6lFD6tC3fN_7FADjyjE7NErRIds1NcUk"
+    fun deleteDealer(id: String) {
+        db.collection("dealers").document(id).delete()
+    }
 
     fun searchApi(q: String) {
         if (q.length < 3) return
-
         _isApiLoading.value = true
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // 1. Strict System Prompt
                 val prompt = """
-                    You are a strict JSON API. 
+                    You are a strict JSON API.
                     List 5 medicines matching "$q" available in India.
                     Output ONLY a JSON Array. No markdown, no "here is the list", no ```json.
                     Schema: [{"name": "string", "salt": "string", "manufacturer": "string", "defaultCategory": "Tablet/Syrup/Injection", "defaultShortId": "string"}]
                 """.trimIndent()
 
-                // 2. Use Gemini 1.5 Flash (Fast & Stable)
                 val url = URL("[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$GEMINI_API_KEY](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$GEMINI_API_KEY)")
                 val conn = url.openConnection() as HttpURLConnection
                 conn.requestMethod = "POST"
                 conn.setRequestProperty("Content-Type", "application/json")
                 conn.doOutput = true
 
-                // 3. Safe JSON Payload Construction
                 val safePrompt = prompt.replace("\"", "\\\"").replace("\n", " ")
                 val jsonPayload = "{\"contents\":[{\"parts\":[{\"text\":\"$safePrompt\"}]}]}"
 
                 conn.outputStream.use { it.write(jsonPayload.toByteArray()) }
 
-                // 4. Handle Response
                 val responseCode = conn.responseCode
                 if (responseCode == 200) {
                     val reader = BufferedReader(InputStreamReader(conn.inputStream))
                     val response = reader.readText()
                     reader.close()
 
-                    // 5. Robust Parsing
                     val root = JSONObject(response)
                     val candidates = root.optJSONArray("candidates")
                     if (candidates != null && candidates.length() > 0) {
-                        val text = candidates.getJSONObject(0)
-                            .getJSONObject("content")
-                            .getJSONArray("parts")
-                            .getJSONObject(0)
-                            .getString("text")
-
-                        // Extract JSON Array specifically (Find first '[' and last ']')
+                        val text = candidates.getJSONObject(0).getJSONObject("content").getJSONArray("parts").getJSONObject(0).getString("text")
                         val startIndex = text.indexOf('[')
                         val endIndex = text.lastIndexOf(']')
 
@@ -540,7 +448,7 @@ class ShopViewModel : ViewModel() {
                                 val obj = jsonArray.getJSONObject(i)
                                 results.add(GlobalMedicine(
                                     name = obj.optString("name", "Unknown"),
-                                    salt = obj.optString("salt", "Composition unavailable"),
+                                    salt = obj.optString("salt", "Unknown"),
                                     manufacturer = obj.optString("manufacturer", "Generic"),
                                     defaultShortId = obj.optString("defaultShortId", "GEN"),
                                     defaultCategory = obj.optString("defaultCategory", "Tablet")
@@ -549,11 +457,8 @@ class ShopViewModel : ViewModel() {
                             _apiResults.value = results
                         }
                     }
-                } else {
-                    Log.e("GeminiAPI", "Error Code: $responseCode")
                 }
             } catch (e: Exception) {
-                Log.e("GeminiAPI", "Exception: ${e.message}")
                 e.printStackTrace()
                 _apiResults.value = emptyList()
             } finally {
@@ -562,9 +467,8 @@ class ShopViewModel : ViewModel() {
         }
     }
 
-    fun clearApiResults() {
-        _apiResults.value = emptyList()
-    }
+    fun clearApiResults() { _apiResults.value = emptyList() }
+
     fun addToCart(m: Medicine, q: Int) {
         if(q in 1..m.quantity) {
             val currentCart = _cart.value.toMutableList()
@@ -582,7 +486,7 @@ class ShopViewModel : ViewModel() {
         }
     }
 
-    fun checkout(cName: String): Bill? {
+    fun checkout(cName: String, cPhone: String): Bill? {
         val c = _cart.value; if(c.isEmpty()) return null
         val uid = _currentUser.value?.uid ?: return null
 
@@ -591,11 +495,13 @@ class ShopViewModel : ViewModel() {
 
         c.forEach { item ->
             total += item.totalAmount
-            tax += (item.totalAmount * item.medicine.gstPercent)/100
+            tax += (item.totalAmount * item.medicine.gstPercent) / 100
         }
 
+        // Pass the phone number into the Bill object
         val bill = Bill(
             customerName = cName.ifBlank { "Cash Sale" },
+            customerPhone = cPhone,
             items = c,
             totalAmount = total,
             totalTax = tax,
@@ -603,23 +509,16 @@ class ShopViewModel : ViewModel() {
         )
 
         viewModelScope.launch(Dispatchers.IO) {
-            // Batch write for atomicity
             val batch = db.batch()
-
-            // 1. Save Bill
             val billRef = db.collection("bills").document(bill.id)
             batch.set(billRef, bill)
-
-            // 2. Update Inventory
             c.forEach { item ->
                 val medRef = db.collection("medicines").document(item.medicine.id)
                 val newQty = item.medicine.quantity - item.qty
                 batch.update(medRef, "quantity", newQty)
             }
-
             batch.commit().await()
         }
-
         _cart.value = emptyList()
         return bill
     }
@@ -628,11 +527,9 @@ class ShopViewModel : ViewModel() {
         val now = Calendar.getInstance()
         val currentMonth = now.get(Calendar.MONTH)
         val currentYear = now.get(Calendar.YEAR)
-
         val lastMonthCal = Calendar.getInstance()
         lastMonthCal.add(Calendar.MONTH, -1)
         val lastMonth = lastMonthCal.get(Calendar.MONTH)
-
         val allBills = _bills.value
 
         val thisMonthTotal = allBills.filter {
@@ -650,21 +547,17 @@ class ShopViewModel : ViewModel() {
             c.get(Calendar.YEAR) == currentYear
         }.sumOf { it.totalAmount }
 
-        return mapOf(
-            "this_month" to thisMonthTotal,
-            "last_month" to lastMonthTotal,
-            "yearly" to yearlyTotal
-        )
+        return mapOf("this_month" to thisMonthTotal, "last_month" to lastMonthTotal, "yearly" to yearlyTotal)
     }
 }
 
-// --- 5. UI CODE (Unchanged styles, minor logic tweaks for Auth) ---
+// --- 5. UI CODE ---
 
-val BrandPrimary = Color(0xFF0D9488) // Modern Teal
-val BrandSecondary = Color(0xFF0F766E) // Darker Teal
-val BrandBackground = Color(0xFFF3F4F6) // Soft Grey
+val BrandPrimary = Color(0xFF0D9488)
+val BrandSecondary = Color(0xFF0F766E)
+val BrandBackground = Color(0xFFF3F4F6)
 val BrandSurface = Color(0xFFFFFFFF)
-val BrandAccent = Color(0xFFF59E0B) // Amber for alerts
+val BrandAccent = Color(0xFFF59E0B)
 val BrandTextDark = Color(0xFF111827)
 val BrandTextLight = Color(0xFF6B7280)
 val AlertRed = Color(0xFFD32F2F)
@@ -705,12 +598,12 @@ fun MedicalShopApp() {
     val currentUser by viewModel.currentUser.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // Auto-navigate if logged in
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
             navController.navigate("main") {
                 popUpTo("onboarding") { inclusive = true }
                 popUpTo("login") { inclusive = true }
+                popUpTo("signup") { inclusive = true }
             }
         }
     }
@@ -761,7 +654,7 @@ fun OnboardingScreen(navController: NavController, viewModel: ShopViewModel) {
             Spacer(modifier = Modifier.height(32.dp))
             Text(Strings.get("app_name", lang), style = MaterialTheme.typography.headlineLarge, color = BrandSurface)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(Strings.get("onboarding_tagline", lang), style = MaterialTheme.typography.bodyMedium, color = BrandSurface.copy(alpha = 0.8f), textAlign = TextAlign.Center)
+            Text(Strings.get("Beyond Your Counter", lang), style = MaterialTheme.typography.bodyMedium, color = BrandSurface.copy(alpha = 2.0f), textAlign = TextAlign.Center)
 
             Spacer(modifier = Modifier.height(64.dp))
 
@@ -770,12 +663,12 @@ fun OnboardingScreen(navController: NavController, viewModel: ShopViewModel) {
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = BrandSurface),
                 shape = RoundedCornerShape(16.dp)
-            ) { Text(Strings.get("get_started", lang), color = BrandPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+            ) { Text(Strings.get("Sign Up", lang), color = BrandPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextButton(onClick = { navController.navigate("login") }) {
-                Text(Strings.get("login_action", lang), color = BrandSurface, fontWeight = FontWeight.Bold)
+            TextButton(onClick = { navController.navigate("Login") }) {
+                Text(Strings.get("Login", lang), color = BrandSurface, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -852,7 +745,6 @@ fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
 
 @Composable
 fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
-    val context = LocalContext.current
     var name by remember { mutableStateOf("") }
     var store by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -862,6 +754,7 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
     var pass by remember { mutableStateOf("") }
     val isLoading by viewModel.isLoading.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(BrandSecondary, BrandPrimary))), contentAlignment = Alignment.Center) {
         Card(
@@ -902,18 +795,9 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
                 item {
                     Button(
                         onClick = {
-                            viewModel.signup(
-                                name, store, email, phone, address, dlNo, pass,
-                                onSuccess = {
-                                    Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
-                                    navController.navigate("main") {
-                                        popUpTo("onboarding") { inclusive = true }
-                                    }
-                                },
-                                onError = { errorMessage ->
-                                    // This will now tell you EXACTLY why it failed
-                                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-                                }
+                            viewModel.signup(name, store, email, phone, address, dlNo, pass,
+                                onSuccess = { navController.navigate("main") { popUpTo("onboarding") { inclusive = true } } },
+                                onError = { msg -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show() }
                             )
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -984,10 +868,6 @@ fun MainScreen(navController: NavController, viewModel: ShopViewModel) {
         }
     }
 }
-
-// Reuse previously defined composables (DashboardTab, PosScreen, InventoryTab, etc.)
-// but ensure they are inside the file scope. I will paste the key UI components here
-// ensuring they use the updated VM.
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1085,79 +965,176 @@ fun DashboardTab(navController: NavController, viewModel: ShopViewModel, onOpenD
     }
 }
 
-// Placeholders for other screens to ensure compilation.
-// These use standard Compose UI as seen in previous steps.
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
+    // 1. Properly define Context at the top
+    val context = LocalContext.current
+
     val medicines by viewModel.medicinesFlow.collectAsState()
     val cart by viewModel.cartFlow.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
+
     var searchQuery by remember { mutableStateOf("") }
-    var customerName by remember { mutableStateOf("") }
     var selectedMedicine by remember { mutableStateOf<Medicine?>(null) }
     var qtyInput by remember { mutableStateOf("1") }
+
+    // State for the Checkout Dialog
+    var showCheckoutDialog by remember { mutableStateOf(false) }
+
     val filteredList = medicines.filter { it.name.contains(searchQuery, true) && it.quantity > 0 }
     val cartTotal = cart.sumOf { it.totalAmount }
 
+    // --- DIALOG 1: QUANTITY PICKER WITH +/- BUTTONS ---
     if (selectedMedicine != null) {
         val med = selectedMedicine!!
+        val currentQty = qtyInput.toIntOrNull() ?: 1
+
         AlertDialog(
-            onDismissRequest = { selectedMedicine = null },
-            title = { Text(selectedMedicine!!.name) },
-            text = { OutlinedTextField(qtyInput, { if(it.all{c->c.isDigit()}) qtyInput = it }, label = { Text("Qty") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)) },
-            confirmButton = { Button(onClick = { viewModel.addToCart(selectedMedicine!!, qtyInput.toIntOrNull()?:1); selectedMedicine = null; qtyInput = "1" }, colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)) { Text("Add") } },
-            containerColor = BrandSurface
+            onDismissRequest = { selectedMedicine = null; qtyInput = "1" },
+            title = { Text("Add ${med.name}", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    Text("Select Quantity", style = MaterialTheme.typography.labelMedium)
+                    Spacer(Modifier.height(16.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // MINUS BUTTON (Manual background to avoid version errors)
+                        IconButton(
+                            onClick = { if (currentQty > 1) qtyInput = (currentQty - 1).toString() },
+                            modifier = Modifier.background(Color.LightGray.copy(alpha = 0.2f), CircleShape)
+                        ) { Icon(Icons.Default.Remove, "Decrease", tint = BrandPrimary) }
+
+                        Text(
+                            text = qtyInput,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(horizontal = 24.dp),
+                            color = BrandPrimary
+                        )
+
+                        // PLUS BUTTON
+                        IconButton(
+                            onClick = {
+                                if (currentQty < med.quantity) qtyInput = (currentQty + 1).toString()
+                                else Toast.makeText(context, "Max stock: ${med.quantity}", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.background(Color.LightGray.copy(alpha = 0.2f), CircleShape)
+                        ) { Icon(Icons.Default.Add, "Increase", tint = BrandPrimary) }
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+                    Text("Available: ${med.quantity}", style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        viewModel.addToCart(med, currentQty)
+                        selectedMedicine = null
+                        qtyInput = "1"
+                    }
+                ) { Text("ADD TO CART") }
+            }
         )
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(Strings.get("new_sale", lang), fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface)) }) { padding ->
-        Column(Modifier.padding(padding).background(BrandBackground).fillMaxSize()) {
-            OutlinedTextField(searchQuery, { searchQuery = it }, placeholder = { Text(Strings.get("search_hint", lang)) }, modifier = Modifier.fillMaxWidth().padding(16.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary), shape = RoundedCornerShape(12.dp))
-            if (cart.isNotEmpty()) {
-                LazyColumn(Modifier.height(150.dp).padding(horizontal = 16.dp)) { items(cart) { item -> Card(Modifier.fillMaxWidth().padding(bottom = 4.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1))) { Row(Modifier.padding(12.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("${item.qty} x ${item.medicine.name}"); Text("₹${item.totalAmount}", fontWeight = FontWeight.Bold) } } } }
-                Button(onClick = { viewModel.checkout(customerName); customerName = "" }, modifier = Modifier.fillMaxWidth().padding(16.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = BrandSecondary), shape = RoundedCornerShape(16.dp)) { Text("CHECKOUT - ₹${String.format("%.2f", cartTotal)}") }
+    // --- DIALOG 2: CUSTOMER DETAILS POPUP ---
+    if (showCheckoutDialog) {
+        var tempName by remember { mutableStateOf("") }
+        var tempPhone by remember { mutableStateOf("") }
+
+        AlertDialog(
+            onDismissRequest = { showCheckoutDialog = false },
+            title = { Text("Checkout Details") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        value = tempName,
+                        onValueChange = { tempName = it },
+                        label = { Text("Customer Name") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = tempPhone,
+                        onValueChange = { if(it.length <= 10) tempPhone = it },
+                        label = { Text("Mobile Number") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        viewModel.checkout(tempName, tempPhone)
+                        showCheckoutDialog = false
+                        Toast.makeText(context, "Sale Completed!", Toast.LENGTH_SHORT).show()
+                    }
+                ) { Text("FINALIZE BILL") }
             }
-            LazyColumn(contentPadding = PaddingValues(16.dp)) { items(filteredList) { item -> Card(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).clickable { selectedMedicine = item }, colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(12.dp)) { Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(item.name, fontWeight = FontWeight.Bold); Text("₹${item.sellingPrice}", color = BrandPrimary, fontWeight = FontWeight.Bold) } } } }
-        }
+        )
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InventoryTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
-    val medicines by viewModel.medicinesFlow.collectAsState()
-    val apiResults by viewModel.apiResults.collectAsState()
-    val categories by viewModel.categories.collectAsState()
-    val lang by viewModel.currentLanguage.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("All") }
-    var isGlobal by remember { mutableStateOf(false) }
-
-    val filteredList = medicines.filter { (selectedCategory == "All" || it.category == selectedCategory) && (it.name.contains(searchQuery, true) || it.shortId.contains(searchQuery, true)) }
-
-    Column(modifier = Modifier.fillMaxSize().background(BrandBackground)) {
-        TopAppBar(title = { Text(Strings.get("inventory", lang), fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }, actions = { TextButton(onClick = { isGlobal = !isGlobal; viewModel.clearApiResults() }) { Text(if(isGlobal) "Local" else "Global", color = BrandPrimary) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface))
-
-        OutlinedTextField(value = searchQuery, onValueChange = { searchQuery = it; if (isGlobal) viewModel.searchApi(it) }, placeholder = { Text(Strings.get("search_hint", lang)) }, leadingIcon = { Icon(Icons.Default.Search, null) }, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary, unfocusedBorderColor = Color.LightGray), shape = RoundedCornerShape(12.dp))
-
-        if (!isGlobal) {
-            LazyRow(modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(categories) { cat -> FilterChip(selected = selectedCategory == cat, onClick = { selectedCategory = cat }, label = { Text(cat) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = BrandPrimary, selectedLabelColor = BrandSurface)) }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(Strings.get("new_sale", lang), fontWeight = FontWeight.Bold) },
+                navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }
+            )
         }
+    ) { padding ->
+        Column(Modifier.padding(padding).background(BrandBackground).fillMaxSize()) {
 
-        LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (isGlobal) {
-                items(apiResults) { item -> Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))) { Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Column { Text(item.name, fontWeight = FontWeight.Bold, color = BrandAccent); Text(item.salt, fontSize = 12.sp) }; Icon(Icons.Default.Public, null, tint = BrandAccent) } } }
-            } else {
+            // Search Bar
+            OutlinedTextField(
+                searchQuery,
+                { searchQuery = it },
+                placeholder = { Text(Strings.get("search_hint", lang)) },
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                leadingIcon = { Icon(Icons.Default.Search, null) },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
+            )
+
+            // Items List
+            LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(horizontal = 16.dp)) {
                 items(filteredList) { item ->
-                    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = BrandSurface)) {
-                        Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) { Text(item.name, fontWeight = FontWeight.Bold); Text("Exp: ${item.expiryDate}", style = MaterialTheme.typography.labelSmall) }
-                            Column(horizontalAlignment = Alignment.End) { Text("₹${item.sellingPrice}", fontWeight = FontWeight.Bold, color = BrandPrimary); Text("${item.quantity} units", fontSize = 12.sp) }
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).clickable { selectedMedicine = item },
+                        colors = CardDefaults.cardColors(containerColor = BrandSurface)
+                    ) {
+                        Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column {
+                                Text(item.name, fontWeight = FontWeight.Bold)
+                                Text("Stock: ${item.quantity}", style = MaterialTheme.typography.labelSmall)
+                            }
+                            Text("₹${item.sellingPrice}", color = BrandPrimary, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
+            // Bottom Cart Summary
+            if (cart.isNotEmpty()) {
+                Surface(modifier = Modifier.fillMaxWidth(), shadowElevation = 8.dp) {
+                    Column(Modifier.padding(16.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("${cart.size} Items", fontWeight = FontWeight.Medium)
+                            Text("Total: ₹${String.format("%.2f", cartTotal)}", fontWeight = FontWeight.Bold, color = BrandPrimary)
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = { showCheckoutDialog = true },
+                            modifier = Modifier.fillMaxWidth().height(56.dp)
+                        ) {
+                            Text("PROCEED TO CHECKOUT")
                         }
                     }
                 }
@@ -1165,91 +1142,225 @@ fun InventoryTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddStockTab(viewModel: ShopViewModel, onAdded: () -> Unit, onOpenDrawer: () -> Unit) {
+fun InventoryTab(viewModel: ShopViewModel, onOpen: () -> Unit) {
+    val meds by viewModel.medicinesFlow.collectAsState()
     val apiResults by viewModel.apiResults.collectAsState()
-    val isApiLoading by viewModel.isApiLoading.collectAsState()
-    val dealers by viewModel.dealers.collectAsState()
-    val lang by viewModel.currentLanguage.collectAsState()
-    var name by remember { mutableStateOf("") }
-    var salt by remember { mutableStateOf("") }
-    var shortId by remember { mutableStateOf("") }
-    var batch by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var selectedDealer by remember { mutableStateOf<Dealer?>(null) }
-    var qty by remember { mutableStateOf("") }
-    var cost by remember { mutableStateOf("") }
-    var mrp by remember { mutableStateOf("") }
-    var expiry by remember { mutableStateOf("") }
-    var showApiDropdown by remember { mutableStateOf(false) }
-    var showCat by remember { mutableStateOf(false) }
-    var showDeal by remember { mutableStateOf(false) }
-    var isRestockMode by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val unitLabel = if(category.isNotEmpty()) CategoryUtils.getUnit(category) else "Units"
-    val medicines by viewModel.medicinesFlow.collectAsState()
-    val localMatches = if (name.length > 1) { medicines.filter { it.name.contains(name, ignoreCase = true) } } else emptyList()
+    var q by remember { mutableStateOf("") }
+    var itemToDelete by remember { mutableStateOf<Medicine?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize().background(BrandBackground)) {
-        TopAppBar(title = { Text(if(isRestockMode) "Restock Item" else Strings.get("add_new", lang), fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface))
-        LazyColumn(Modifier.padding(16.dp)) {
-            item {
-                SectionHeader("Smart Search")
-                Box {
-                    OutlinedTextField(
-                        value = name, onValueChange = { name = it; if(it.length>1) { viewModel.searchApi(it); showApiDropdown = true } else { showApiDropdown = false; isRestockMode = false } }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
-                    )
-                    if (showApiDropdown && (localMatches.isNotEmpty() || apiResults.isNotEmpty())) {
-                        Card(modifier = Modifier.padding(top=56.dp).heightIn(max=250.dp), colors = CardDefaults.cardColors(containerColor = BrandSurface), elevation = CardDefaults.cardElevation(8.dp)) {
-                            LazyColumn {
-                                if(localMatches.isNotEmpty()) {
-                                    item { Text("In Your Inventory", style = MaterialTheme.typography.labelSmall, color = BrandPrimary, modifier = Modifier.padding(8.dp).background(BrandBackground).fillMaxWidth()) }
-                                    items(localMatches) { item -> Row(Modifier.fillMaxWidth().clickable { name = item.name; salt = item.saltName; shortId = item.shortId; category = item.category; mrp = item.sellingPrice.toString(); cost = item.purchasePrice.toString(); isRestockMode = true; showApiDropdown = false; Toast.makeText(context, "Existing item details loaded!", Toast.LENGTH_SHORT).show() }.padding(12.dp)) { Icon(Icons.Default.Inventory, null, tint = WarningOrange, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(item.name, fontWeight = FontWeight.Bold) } }
-                                }
-                                if(apiResults.isNotEmpty()) {
-                                    item { Text("Global Database", style = MaterialTheme.typography.labelSmall, color = BrandTextLight, modifier = Modifier.padding(8.dp).background(BrandBackground).fillMaxWidth()) }
-                                    items(apiResults) { res -> Row(Modifier.fillMaxWidth().clickable { name = res.name; salt = res.salt; shortId = res.defaultShortId; category = res.defaultCategory; isRestockMode = false; showApiDropdown = false; viewModel.clearApiResults() }.padding(12.dp)) { Icon(Icons.Default.Public, null, tint = Color.Gray, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(res.name, fontWeight = FontWeight.Bold) } }
-                                }
+    if (itemToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { itemToDelete = null },
+            title = { Text("Remove Item") },
+            text = { Text("Are you sure you want to remove ${itemToDelete?.name} from your inventory?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    itemToDelete?.id?.let { viewModel.deleteMedicine(it) }
+                    itemToDelete = null
+                }) { Text("REMOVE", color = AlertRed) }
+            },
+            dismissButton = {
+                TextButton(onClick = { itemToDelete = null }) { Text("CANCEL") }
+            }
+        )
+    }
+
+    Scaffold(topBar = { TopAppBar(title = { Text("Inventory") }, navigationIcon = { IconButton(onClick = onOpen) { Icon(Icons.Default.Menu, null) } }) }) { p ->
+        Column(Modifier.padding(p).padding(16.dp)) {
+            OutlinedTextField(q, { q = it; viewModel.searchApi(it) }, label = { Text("Search Global") }, modifier = Modifier.fillMaxWidth())
+            if (apiResults.isNotEmpty()) {
+                apiResults.forEach { res -> Card(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { viewModel.addStock(Medicine(name = res.name, saltName = res.salt)); viewModel.clearApiResults() }) { Text(res.name, Modifier.padding(8.dp)) } }
+            }
+            HorizontalDivider(Modifier.padding(vertical = 16.dp))
+            LazyColumn {
+                items(meds) { m ->
+                    Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text(m.name, fontWeight = FontWeight.Bold)
+                                Text(m.batchNo, style = MaterialTheme.typography.labelSmall)
+                            }
+                            Text("Qty: ${m.quantity}", color = if(m.quantity < 5) AlertRed else Color.Unspecified, modifier = Modifier.padding(horizontal = 8.dp))
+                            IconButton(onClick = { itemToDelete = m }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = AlertRed)
                             }
                         }
                     }
                 }
-
-                SectionHeader("Product Info")
-                Card(colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(16.dp)) {
-                    Column(Modifier.padding(16.dp)) {
-                        Box {
-                            OutlinedTextField(value = category, onValueChange = {}, readOnly = true, label = { Text("Category") }, modifier = Modifier.fillMaxWidth(), trailingIcon = { IconButton(onClick = { showCat = true }) { Icon(Icons.Default.ArrowDropDown, null) } }, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
-                            DropdownMenu(expanded = showCat, onDismissRequest = { showCat = false }, modifier = Modifier.background(BrandSurface)) { CategoryUtils.categories.forEach { c -> DropdownMenuItem(text = { Text(c.name) }, onClick = { category = c.name; showCat = false }) } }
-                        }
-                        Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = shortId, onValueChange = { shortId = it.uppercase() }, label = { Text("Short ID") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = batch, onValueChange = { batch = it.uppercase() }, label = { Text("Batch No") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
-                        Spacer(Modifier.height(12.dp))
-                        OutlinedTextField(value = salt, onValueChange = { salt = it }, label = { Text("Salt Composition") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
-                    }
-                }
-
-                SectionHeader("Stock & Supplier")
-                Card(colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(16.dp)) {
-                    Column(Modifier.padding(16.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = qty, onValueChange = { qty = it }, label = { Text("Qty ($unitLabel)") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = expiry, onValueChange = { expiry = it }, label = { Text("Exp (MM/YY)") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
-                        Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text("Buy Rate") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = mrp, onValueChange = { mrp = it }, label = { Text("MRP") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
-                        Spacer(Modifier.height(12.dp))
-                        Box {
-                            OutlinedTextField(value = selectedDealer?.agencyName?:"", onValueChange = {}, readOnly = true, label = { Text("Supplier") }, modifier = Modifier.fillMaxWidth(), trailingIcon = { IconButton(onClick = { showDeal = true }) { Icon(Icons.Default.ArrowDropDown, null) } }, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
-                            DropdownMenu(expanded = showDeal, onDismissRequest = { showDeal = false }, modifier = Modifier.background(BrandSurface)) { dealers.forEach { d -> DropdownMenuItem(text = { Text(d.agencyName) }, onClick = { selectedDealer = d; showDeal = false }) } }
-                        }
-                        Spacer(Modifier.height(24.dp))
-                        Button(onClick = { if(name.isNotEmpty()) { viewModel.addStock(Medicine(shortId = shortId, name = name, batchNo = batch, saltName = salt, category = category.ifBlank { "General" }, quantity = qty.toIntOrNull()?:0, purchasePrice = cost.toDoubleOrNull()?:0.0, sellingPrice = mrp.toDoubleOrNull()?:0.0, gstPercent = 12.0, expiryDate = expiry, dealerId = selectedDealer?.id?:"")); Toast.makeText(context, if(isRestockMode) "Stock Updated!" else "Added!", Toast.LENGTH_SHORT).show(); onAdded() } }, modifier = Modifier.fillMaxWidth().height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isRestockMode) WarningOrange else BrandPrimary), shape = RoundedCornerShape(12.dp)) { Text(if(isRestockMode) "UPDATE STOCK" else Strings.get("save_inventory", lang)) }
-                    }
-                }
             }
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
+
+@Composable
+
+fun AddStockTab(viewModel: ShopViewModel, onAdded: () -> Unit, onOpenDrawer: () -> Unit) {
+
+    val apiResults by viewModel.apiResults.collectAsState()
+
+    val isApiLoading by viewModel.isApiLoading.collectAsState()
+
+    val dealers by viewModel.dealers.collectAsState()
+
+    val lang by viewModel.currentLanguage.collectAsState()
+
+    var name by remember { mutableStateOf("") }
+
+    var salt by remember { mutableStateOf("") }
+
+    var shortId by remember { mutableStateOf("") }
+
+    var batch by remember { mutableStateOf("") }
+
+    var category by remember { mutableStateOf("") }
+
+    var selectedDealer by remember { mutableStateOf<Dealer?>(null) }
+
+    var qty by remember { mutableStateOf("") }
+
+    var cost by remember { mutableStateOf("") }
+
+    var mrp by remember { mutableStateOf("") }
+
+    var expiry by remember { mutableStateOf("") }
+
+    var showApiDropdown by remember { mutableStateOf(false) }
+
+    var showCat by remember { mutableStateOf(false) }
+
+    var showDeal by remember { mutableStateOf(false) }
+
+    var isRestockMode by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    val unitLabel = if(category.isNotEmpty()) CategoryUtils.getUnit(category) else "Units"
+
+    val medicines by viewModel.medicinesFlow.collectAsState()
+
+    val localMatches = if (name.length > 1) { medicines.filter { it.name.contains(name, ignoreCase = true) } } else emptyList()
+
+
+
+    Column(modifier = Modifier.fillMaxSize().background(BrandBackground)) {
+
+        TopAppBar(title = { Text(if(isRestockMode) "Restock Item" else Strings.get("add_new", lang), fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface))
+
+        LazyColumn(Modifier.padding(16.dp)) {
+
+            item {
+
+                SectionHeader("Smart Search")
+
+                Box {
+
+                    OutlinedTextField(
+
+                        value = name, onValueChange = { name = it; if(it.length>1) { viewModel.searchApi(it); showApiDropdown = true } else { showApiDropdown = false; isRestockMode = false } }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
+
+                    )
+
+                    if (showApiDropdown && (localMatches.isNotEmpty() || apiResults.isNotEmpty())) {
+
+                        Card(modifier = Modifier.padding(top=56.dp).heightIn(max=250.dp), colors = CardDefaults.cardColors(containerColor = BrandSurface), elevation = CardDefaults.cardElevation(8.dp)) {
+
+                            LazyColumn {
+
+                                if(localMatches.isNotEmpty()) {
+
+                                    item { Text("In Your Inventory", style = MaterialTheme.typography.labelSmall, color = BrandPrimary, modifier = Modifier.padding(8.dp).background(BrandBackground).fillMaxWidth()) }
+
+                                    items(localMatches) { item -> Row(Modifier.fillMaxWidth().clickable { name = item.name; salt = item.saltName; shortId = item.shortId; category = item.category; mrp = item.sellingPrice.toString(); cost = item.purchasePrice.toString(); isRestockMode = true; showApiDropdown = false; Toast.makeText(context, "Existing item details loaded!", Toast.LENGTH_SHORT).show() }.padding(12.dp)) { Icon(Icons.Default.Inventory, null, tint = WarningOrange, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(item.name, fontWeight = FontWeight.Bold) } }
+
+                                }
+
+                                if(apiResults.isNotEmpty()) {
+
+                                    item { Text("Global Database", style = MaterialTheme.typography.labelSmall, color = BrandTextLight, modifier = Modifier.padding(8.dp).background(BrandBackground).fillMaxWidth()) }
+
+                                    items(apiResults) { res -> Row(Modifier.fillMaxWidth().clickable { name = res.name; salt = res.salt; shortId = res.defaultShortId; category = res.defaultCategory; isRestockMode = false; showApiDropdown = false; viewModel.clearApiResults() }.padding(12.dp)) { Icon(Icons.Default.Public, null, tint = Color.Gray, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(res.name, fontWeight = FontWeight.Bold) } }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+
+
+                SectionHeader("Product Info")
+
+                Card(colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(16.dp)) {
+
+                    Column(Modifier.padding(16.dp)) {
+
+                        Box {
+
+                            OutlinedTextField(value = category, onValueChange = {}, readOnly = true, label = { Text("Category") }, modifier = Modifier.fillMaxWidth(), trailingIcon = { IconButton(onClick = { showCat = true }) { Icon(Icons.Default.ArrowDropDown, null) } }, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
+
+                            DropdownMenu(expanded = showCat, onDismissRequest = { showCat = false }, modifier = Modifier.background(BrandSurface)) { CategoryUtils.categories.forEach { c -> DropdownMenuItem(text = { Text(c.name) }, onClick = { category = c.name; showCat = false }) } }
+
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = shortId, onValueChange = { shortId = it.uppercase() }, label = { Text("Short ID") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = batch, onValueChange = { batch = it.uppercase() }, label = { Text("Batch No") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        OutlinedTextField(value = salt, onValueChange = { salt = it }, label = { Text("Salt Composition") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
+
+                    }
+
+                }
+
+
+
+                SectionHeader("Stock & Supplier")
+
+                Card(colors = CardDefaults.cardColors(containerColor = BrandSurface), shape = RoundedCornerShape(16.dp)) {
+
+                    Column(Modifier.padding(16.dp)) {
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = qty, onValueChange = { qty = it }, label = { Text("Qty ($unitLabel)") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = expiry, onValueChange = { expiry = it }, label = { Text("Exp (MM/YY)") }, modifier = Modifier.weight(1f), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text("Buy Rate") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)); OutlinedTextField(value = mrp, onValueChange = { mrp = it }, label = { Text("MRP") }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)) }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Box {
+
+                            OutlinedTextField(value = selectedDealer?.agencyName?:"", onValueChange = {}, readOnly = true, label = { Text("Supplier") }, modifier = Modifier.fillMaxWidth(), trailingIcon = { IconButton(onClick = { showDeal = true }) { Icon(Icons.Default.ArrowDropDown, null) } }, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary))
+
+                            DropdownMenu(expanded = showDeal, onDismissRequest = { showDeal = false }, modifier = Modifier.background(BrandSurface)) { dealers.forEach { d -> DropdownMenuItem(text = { Text(d.agencyName) }, onClick = { selectedDealer = d; showDeal = false }) } }
+
+                        }
+
+                        Spacer(Modifier.height(24.dp))
+
+                        Button(onClick = { if(name.isNotEmpty()) { viewModel.addStock(Medicine(shortId = shortId, name = name, batchNo = batch, saltName = salt, category = category.ifBlank { "General" }, quantity = qty.toIntOrNull()?:0, purchasePrice = cost.toDoubleOrNull()?:0.0, sellingPrice = mrp.toDoubleOrNull()?:0.0, gstPercent = 12.0, expiryDate = expiry, dealerId = selectedDealer?.id?:"")); Toast.makeText(context, if(isRestockMode) "Stock Updated!" else "Added!", Toast.LENGTH_SHORT).show(); onAdded() } }, modifier = Modifier.fillMaxWidth().height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isRestockMode) WarningOrange else BrandPrimary), shape = RoundedCornerShape(12.dp)) { Text(if(isRestockMode) "UPDATE STOCK" else Strings.get("save_inventory", lang)) }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1258,7 +1369,24 @@ fun DealersTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
     val lang by viewModel.currentLanguage.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var itemToDelete by remember { mutableStateOf<Dealer?>(null) }
 
+    if (itemToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { itemToDelete = null },
+            title = { Text("Remove Dealer") },
+            text = { Text("Are you sure you want to remove ${itemToDelete?.name} ?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    itemToDelete?.id?.let { viewModel.deleteDealer(it) }
+                    itemToDelete = null
+                }) { Text("REMOVE", color = AlertRed) }
+            },
+            dismissButton = {
+                TextButton(onClick = { itemToDelete = null }) { Text("CANCEL") }
+            }
+        )
+    }
     if (showAddDialog) {
         var dName by remember { mutableStateOf("") }
         var dAgency by remember { mutableStateOf("") }
@@ -1275,6 +1403,9 @@ fun DealersTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
                         Column { Text(dealer.agencyName, fontWeight = FontWeight.Bold, fontSize = 16.sp); Text(dealer.phone, color = BrandTextLight) }
                         IconButton(onClick = { makeCall(context, dealer.phone) }, modifier = Modifier.background(BrandPrimary, CircleShape)) { Icon(Icons.Default.Call, null, tint = BrandSurface) }
                     }
+                    IconButton(onClick = { itemToDelete = dealer }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = AlertRed)
+                    }
                 }
             }
         }
@@ -1285,37 +1416,49 @@ fun DealersTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 @Composable
 fun TransactionsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
     val bills by viewModel.billsFlow.collectAsState()
-    val lang by viewModel.currentLanguage.collectAsState()
-    var selectedBill by remember { mutableStateOf<Bill?>(null) }
+    var searchHistoryQuery by remember { mutableStateOf("") }
 
-    if (selectedBill != null) {
-        ReceiptDialog(bill = selectedBill!!, onDismiss = { selectedBill = null })
+    // Filter bills based on Customer Name or Phone Number
+    val filteredBills = bills.filter {
+        it.customerName.contains(searchHistoryQuery, ignoreCase = true) ||
+                it.customerPhone.contains(searchHistoryQuery)
     }
 
     Column(modifier = Modifier.fillMaxSize().background(BrandBackground)) {
         TopAppBar(
-            title = { Text(Strings.get("history", lang), fontWeight = FontWeight.Bold) },
-            navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandSurface)
+            title = { Text("Billing History", fontWeight = FontWeight.Bold) },
+            navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }
         )
+
+        // SEARCH BAR FOR TRACKING
+        OutlinedTextField(
+            value = searchHistoryQuery,
+            onValueChange = { searchHistoryQuery = it },
+            placeholder = { Text("Search by Name or Phone...") },
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            leadingIcon = { Icon(Icons.Default.Search, null) },
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
+        )
+
         LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(bills) { bill ->
+            items(filteredBills) { bill ->
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { selectedBill = bill },
-                    colors = CardDefaults.cardColors(containerColor = BrandSurface),
-                    elevation = CardDefaults.cardElevation(2.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = BrandSurface)
                 ) {
                     Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
-                            Text("Bill #${bill.id}", fontWeight = FontWeight.Bold)
-                            Text(bill.customerName, fontSize = 12.sp, color = BrandTextLight)
+                            Text(bill.customerName, fontWeight = FontWeight.Bold)
+                            if(bill.customerPhone.isNotEmpty()) {
+                                Text(bill.customerPhone, style = MaterialTheme.typography.bodySmall, color = BrandPrimary)
+                            }
+                            Text("ID: ${bill.id}", fontSize = 10.sp, color = Color.Gray)
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text("₹${String.format("%.2f", bill.totalAmount)}", fontWeight = FontWeight.Bold, color = BrandPrimary)
+                            Text("₹${String.format("%.2f", bill.totalAmount)}", fontWeight = FontWeight.Bold)
                             val date = Date(bill.date)
-                            Text(SimpleDateFormat("dd MMM", Locale.getDefault()).format(date), fontSize = 12.sp, color = BrandTextLight)
+                            Text(SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(date), fontSize = 12.sp)
                         }
                     }
                 }
@@ -1323,13 +1466,6 @@ fun TransactionsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
         }
     }
 }
-
-
-@Composable
-fun ReceiptDialog(x0: Bill, content: @Composable () -> Unit) {
-    TODO("Not yet implemented")
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
@@ -1352,26 +1488,26 @@ fun ReportsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 
 @Composable fun SectionHeader(title: String) { Text(text = title, style = MaterialTheme.typography.labelLarge, color = BrandPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp, top = 16.dp, start = 4.dp)) }
 @Composable fun StatsCard(title: String, value: String, color: Color, icon: ImageVector, modifier: Modifier) { Card(modifier, colors = CardDefaults.cardColors(containerColor = BrandSurface), elevation = CardDefaults.cardElevation(2.dp)) { Column(Modifier.padding(16.dp)) { Icon(icon, null, tint = color); Spacer(Modifier.height(12.dp)); Text(value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = BrandTextDark); Text(title, fontSize = 12.sp, color = BrandTextLight) } } }
+
+// --- UTILS FOR PDF & DIALOG ---
+
 fun saveBillAsPdf(context: Context, bill: Bill) {
     try {
-        val pdfDocument = PdfDocument()
-        // Page size: 300 points wide (approx 4 inches), 600 points tall
-        val pageInfo = PdfDocument.PageInfo.Builder(300, 600, 1).create()
+        val pdfDocument = android.graphics.pdf.PdfDocument()
+        val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(300, 600, 1).create()
         val page = pdfDocument.startPage(pageInfo)
         val canvas = page.canvas
         val paint = Paint()
 
-        // Header
         paint.textSize = 12f
         paint.color = android.graphics.Color.BLACK
         paint.typeface = Typeface.DEFAULT_BOLD
         var y = 20f
 
         paint.textSize = 16f
-        canvas.drawText("MEDFLOW PHARMACY", 50f, y, paint)
+        canvas.drawText("PillPoint", 50f, y, paint)
         y += 25f
 
-        // Bill Info
         paint.textSize = 12f
         paint.typeface = Typeface.DEFAULT
         canvas.drawText("Bill #${bill.id}", 10f, y, paint)
@@ -1382,12 +1518,18 @@ fun saveBillAsPdf(context: Context, bill: Bill) {
         y += 15f
         canvas.drawText("Customer: ${bill.customerName}", 10f, y, paint)
         y += 20f
+        canvas.drawText("Items:", 10f, y, paint)
+        y += 15f
 
-        // Divider
+
+        if (bill.customerPhone.isNotEmpty()) {
+            canvas.drawText("Contact: ${bill.customerPhone}", 10f, y, paint)
+            y += 15f
+        }
+
         canvas.drawLine(10f, y, 290f, y, paint)
         y += 15f
 
-        // Items
         bill.items.forEach { item ->
             val name = if (item.medicine.name.length > 20) item.medicine.name.substring(0, 17) + "..." else item.medicine.name
             canvas.drawText("${item.qty} x $name", 10f, y, paint)
@@ -1395,19 +1537,16 @@ fun saveBillAsPdf(context: Context, bill: Bill) {
             y += 15f
         }
 
-        // Divider
         y += 5f
         canvas.drawLine(10f, y, 290f, y, paint)
         y += 20f
 
-        // Total
         paint.typeface = Typeface.DEFAULT_BOLD
         paint.textSize = 14f
         canvas.drawText("Total: ₹${String.format("%.2f", bill.totalAmount)}", 10f, y, paint)
 
         pdfDocument.finishPage(page)
 
-        // Save to Downloads
         val resolver = context.contentResolver
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, "Bill_${bill.id}_${System.currentTimeMillis()}.pdf")
@@ -1451,7 +1590,6 @@ fun ReceiptDialog(bill: Bill, onDismiss: () -> Unit) {
                 Text("Bill #${bill.id}", color = BrandTextLight, fontSize = 14.sp)
                 Spacer(Modifier.height(24.dp))
 
-                // Items List (Scrollable)
                 LazyColumn(modifier = Modifier.heightIn(max = 200.dp).fillMaxWidth()) {
                     items(bill.items) { item ->
                         Row(
