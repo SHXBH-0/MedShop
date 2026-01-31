@@ -10,117 +10,111 @@ Built for the Amravati Hackathon, Pill Point aims to digitize the healthcare sup
 
 🚩 The Problem
 
-Local medical stores currently suffer from:
+  *Local medical stores currently suffer from:
 
-Manual Billing: Slow, error-prone calculations using calculators and paper.
+  *Manual Billing: Slow, error-prone calculations using calculators and paper.
 
-Inventory Blindness: No real-time visibility on stock levels or expiry dates.
+  *Inventory Blindness: No real-time visibility on stock levels or expiry dates.
 
-Supplier Disconnect: Contact details and purchase history scattered across visiting cards and diaries.
+  *Supplier Disconnect: Contact details and purchase history scattered across visiting cards and diaries.
 
-Lack of Analytics: No data on "Fast-moving" vs. "Slow-moving" medicines.
+  *Lack of Analytics: No data on "Fast-moving" vs. "Slow-moving" medicines.
 
 💡 The Solution
 
-Pill Point provides an all-in-one Android application that offers:
+*Pill Point provides an all-in-one Android application that offers:
 
-Smart POS (Point of Sale): Instant bill generation with auto-calculation of totals and taxes.
+*Smart POS (Point of Sale): Instant bill generation with auto-calculation of totals and taxes.
 
-PDF Invoicing: Generates professional digital receipts instantly.
+*PDF Invoicing: Generates professional digital receipts instantly.
 
-Global Medicine Search: Powered by Google Gemini AI to fetch global medicine details (Salt, Manufacturer) automatically.
+*Global Medicine Search: Powered by Google Gemini AI to fetch global medicine details (Salt, Manufacturer) automatically.
 
-Inventory Intelligence: Categorized tracking (Tablets, Syrups, etc.) with low-stock alerts.
+*Inventory Intelligence: Categorized tracking (Tablets, Syrups, etc.) with low-stock alerts.
 
-Supplier Directory: Direct "Click-to-Call" functionality and centralized dealer records.
+*Supplier Directory: Direct "Click-to-Call" functionality and centralized dealer records.
 
 📱 Key Features
 
-🔐 Secure Onboarding: Shop registration with Drug License Number verification.
+   🔐 Secure Onboarding: Shop registration with Drug License Number verification.
 
-📦 Smart Inventory: Add stock with batch numbers, expiry dates, and categories.
+   📦 Smart Inventory: Add stock with batch numbers, expiry dates, and categories.
 
-🤖 AI Integration: Uses Gemini API to auto-fill medicine details, reducing data entry time.
+   🤖 AI Integration: Uses Gemini API to auto-fill medicine details, reducing data entry time.
 
-🧾 Digital Billing: Cart system for counter sales with PDF export to local storage.
+   🧾 Digital Billing: Cart system for counter sales with PDF export to local storage.
+ 
+   📊 Insightful Dashboard: Real-time view of daily revenue, recent transactions, and critical stock alerts.
 
-📊 Insightful Dashboard: Real-time view of daily revenue, recent transactions, and critical stock alerts.
-
-🌍 Multilingual: Available in English, Hindi, Marathi.
+   🌍 Multilingual: Available in English, Hindi, Marathi.
 
 🛠️ Tech Stack
 
-Language: Kotlin
+ *Language: Kotlin
 
-UI Framework: Jetpack Compose (Material 3 Design)
+ *UI Framework: Jetpack Compose (Material 3 Design)
 
-Architecture: MVVM (Model-View-ViewModel)
+ *Architecture: MVVM (Model-View-ViewModel)
 
-Backend: Firebase Authentication & Cloud Firestore
+ *Backend: Firebase Authentication & Cloud Firestore
 
-AI Model: Google Gemini 1.5 Flash (via REST API)
+ *AI Model: Google Gemini 1.5 Flash (via REST API)
 
-PDF Generation: Android Native PDF Document API
+ *PDF Generation: Android Native PDF Document API
 
 🚀 Getting Started
 
-Prerequisites
+  *Prerequisites
 
-Android Studio Hedgehog or later.
+  *Android Studio Hedgehog or later.
 
-Android Device/Emulator (Min SDK 24).
+  *Android Device/Emulator (Min SDK 24).
 
-A Google Cloud API Key (for Gemini).
+  *A Google Cloud API Key (for Gemini).
 
-google-services.json file (for Firebase).
+  *google-services.json file (for Firebase).
 
-Installation
+  *Installation
 
-Clone the repository:
+  *Clone the repository:
 
-git clone [[https://github.com/SHXBH-0/PillPoint.git](https://github.com/SHXBH-0/MedShop.git)]
+  *git clone [[https://github.com/SHXBH-0/PillPoint.git](https://github.com/SHXBH-0/MedShop.git)]
 
 
 
-Firebase Setup:
+🔥Firebase Setup:
 
-Create a project on Firebase Console.
+  *Create a project on Firebase Console.
 
-Enable Authentication (Email/Password) and Firestore Database.
+  *Enable Authentication (Email/Password) and Firestore Database.
 
-Download google-services.json and place it in the app/ directory.
+  *Download google-services.json and place it in the app/ directory.
 
-API Key Setup:
+  *API Key Setup:
 
-Open MainActivity.kt.
+  *Open MainActivity.kt.
 
-Replace YOUR_GEMINI_API_KEY_HERE with your actual API key.
+  *Replace YOUR_GEMINI_API_KEY_HERE with your actual API key.
 
-Build & Run:
+  *Build & Run:
 
-Sync Gradle files and run on an emulator or physical device.
+  *Sync Gradle files and run on an emulator or physical device.
 
 🔮 Future Roadmap
 
-$$$$
+*Integration with WhatsApp for sending bills directly to customers.
 
- Integration with WhatsApp for sending bills directly to customers.
+*Barcode/QR Code scanning for faster checkout.
 
-$$$$
-
- Barcode/QR Code scanning for faster checkout.
-
-$$$$
-
- Expiry date push notifications.
+*Expiry date push notifications.
 
 
 👥 Contributors
 
-Rijul Samaiya - Lead Developer
-Shubh Jain - Backend Developer
-Rupesh panda - Frontend Developer
-Shreya Bhagat - Research & Analysis
+ Rijul Samaiya - Lead Developer
+ Shubh Jain - Backend Developer
+ Rupesh panda - Frontend Developer
+ Shreya Bhagat - Research & Analysis
 
 📄 License
 
