@@ -23,15 +23,16 @@
 **💡 The Solution**
   **Pill Point provides an all-in-one Android application that offers:**
 
-    -Smart POS(Point of Sale): Instant bill generation with auto-calculation of totals and taxes.
+  ***-Smart POS(Point of Sale):*** Instant bill generation with auto-calculation of totals and taxes.
 
-    -PDF Invoicing: Generates professional digital receipts instantly.
+  ***-PDF Invoicing:*** Generates professional digital receipts instantly.
 
-    -Global Medicine Search: Powered by Google Gemini AI to fetch global medicine details (Salt, Manufacturer) automatically.
+ ***-Global Medicine Search:*** Powered by Google Gemini AI to fetch global medicine details (Salt, Manufacturer) automatically.
 
-    -Inventory Intelligence: Categorized tracking (Tablets, Syrups, etc.) with low-stock alerts.
+ ***-Inventory Intelligence:*** Categorized tracking (Tablets, Syrups, etc.) with low-stock alerts.
 
-    -Supplier Directory: Direct "Click-to-Call" functionality and centralized dealer records.
+ ***-Supplier Directory:*** Direct "Click-to-Call" functionality and centralized dealer records.
+
 
 **📱 Key Features**
 
