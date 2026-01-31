@@ -983,7 +983,6 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
                             }
                         )
                     )
-
                     Spacer(modifier = Modifier.height(32.dp))
                 }
                 item {
@@ -1608,51 +1607,23 @@ fun DealersTab(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
+fun TransactionsScreen(viewModel: ShopViewModel, onOpen: () -> Unit) {
     val bills by viewModel.billsFlow.collectAsState()
-    var searchHistoryQuery by remember { mutableStateOf("") }
+    var q by remember { mutableStateOf("") }
+    var billView by remember { mutableStateOf<Bill?>(null) }
+    val filtered = bills.filter { it.customerName.contains(q, true) || it.customerPhone.contains(q) }
 
-    // Filter bills based on Customer Name or Phone Number
-    val filteredBills = bills.filter {
-        it.customerName.contains(searchHistoryQuery, ignoreCase = true) ||
-                it.customerPhone.contains(searchHistoryQuery)
-    }
+    if (billView != null) ReceiptDialog(billView!!) { billView = null }
 
-    Column(modifier = Modifier.fillMaxSize().background(BrandBackground)) {
-        TopAppBar(
-            title = { Text("Billing History", fontWeight = FontWeight.Bold) },
-            navigationIcon = { IconButton(onClick = onOpenDrawer) { Icon(Icons.Default.Menu, null) } }
-        )
-
-        // SEARCH BAR FOR TRACKING
-        OutlinedTextField(
-            value = searchHistoryQuery,
-            onValueChange = { searchHistoryQuery = it },
-            placeholder = { Text("Search by Name or Phone...") },
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            leadingIcon = { Icon(Icons.Default.Search, null) },
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
-        )
-
-        LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(filteredBills) { bill ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = BrandSurface)
-                ) {
-                    Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Column {
-                            Text(bill.customerName, fontWeight = FontWeight.Bold)
-                            if(bill.customerPhone.isNotEmpty()) {
-                                Text(bill.customerPhone, style = MaterialTheme.typography.bodySmall, color = BrandPrimary)
-                            }
-                            Text("ID: ${bill.id}", fontSize = 10.sp, color = Color.Gray)
-                        }
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text("₹${String.format("%.2f", bill.totalAmount)}", fontWeight = FontWeight.Bold)
-                            val date = Date(bill.date)
-                            Text(SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(date), fontSize = 12.sp)
+    Scaffold(topBar = { TopAppBar(title = { Text("History") }, navigationIcon = { IconButton(onClick = onOpen) { Icon(Icons.Default.Menu, null) } }) }) { p ->
+        Column(Modifier.padding(p).fillMaxSize().background(BrandBackground)) {
+            OutlinedTextField(q, { q = it }, label = { Text("Search by Name/Phone") }, modifier = Modifier.fillMaxWidth().padding(16.dp))
+            LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(filtered) { b ->
+                    Card(Modifier.fillMaxWidth().clickable { billView = b }) {
+                        Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column { Text(b.customerName, fontWeight = FontWeight.Bold); Text(b.customerPhone, color = BrandPrimary) }
+                            Text("₹${b.totalAmount}", fontWeight = FontWeight.ExtraBold)
                         }
                     }
                 }
@@ -1687,83 +1658,99 @@ fun ReportsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 
 fun saveBillAsPdf(context: Context, bill: Bill) {
     try {
-        val pdfDocument = android.graphics.pdf.PdfDocument()
-        val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(300, 600, 1).create()
+        val pdfDocument = PdfDocument()
+        // Standard A4-ish ratio for mobile receipts
+        val pageInfo = PdfDocument.PageInfo.Builder(300, 700, 1).create()
         val page = pdfDocument.startPage(pageInfo)
         val canvas = page.canvas
         val paint = Paint()
 
-        paint.textSize = 12f
-        paint.color = android.graphics.Color.BLACK
-        paint.typeface = Typeface.DEFAULT_BOLD
-        var y = 20f
+        var y = 40f
+        val xMargin = 20f
 
-        paint.textSize = 16f
-        canvas.drawText("PillPoint", 50f, y, paint)
+        // 1. Header
+        paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        paint.textSize = 18f
+        paint.color = android.graphics.Color.BLACK
+        canvas.drawText("PillPoint Receipt", xMargin, y, paint)
+
+        y += 30f
+        paint.typeface = Typeface.DEFAULT
+        paint.textSize = 12f
+
+        // 2. Bill Info
+        val dateStr = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(bill.date))
+        canvas.drawText("Bill ID: #${bill.id}", xMargin, y, paint)
+        y += 20f
+        canvas.drawText("Date: $dateStr", xMargin, y, paint)
+        y += 20f
+        canvas.drawText("Customer: ${bill.customerName}", xMargin, y, paint)
+        if (bill.customerPhone.isNotEmpty()) {
+            y += 20f
+            canvas.drawText("Contact: ${bill.customerPhone}", xMargin, y, paint)
+        }
+
+        y += 25f
+        paint.strokeWidth = 1f
+        canvas.drawLine(xMargin, y, 280f, y, paint) // Separator
         y += 25f
 
-        paint.textSize = 12f
+        // 3. Items Header
+        paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        canvas.drawText("Items", xMargin, y, paint)
+        canvas.drawText("Price", 220f, y, paint)
+        y += 20f
         paint.typeface = Typeface.DEFAULT
-        canvas.drawText("Bill #${bill.id}", 10f, y, paint)
-        y += 15f
 
-        val date = Date(bill.date)
-        canvas.drawText("Date: ${SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault()).format(date)}", 10f, y, paint)
-        y += 15f
-        canvas.drawText("Customer: ${bill.customerName}", 10f, y, paint)
-        y += 20f
-        canvas.drawText("Items:", 10f, y, paint)
-        y += 15f
-
-
-        if (bill.customerPhone.isNotEmpty()) {
-            canvas.drawText("Contact: ${bill.customerPhone}", 10f, y, paint)
-            y += 15f
-        }
-
-        canvas.drawLine(10f, y, 290f, y, paint)
-        y += 15f
-
+        // 4. List Items
         bill.items.forEach { item ->
-            val name = if (item.medicine.name.length > 20) item.medicine.name.substring(0, 17) + "..." else item.medicine.name
-            canvas.drawText("${item.qty} x $name", 10f, y, paint)
-            canvas.drawText(String.format("%.2f", item.totalAmount), 220f, y, paint)
-            y += 15f
+            val displayName = if (item.medicine.name.length > 22) item.medicine.name.take(19) + "..." else item.medicine.name
+            canvas.drawText("${item.qty} x $displayName", xMargin, y, paint)
+            canvas.drawText(String.format("₹%.2f", item.totalAmount), 220f, y, paint)
+            y += 20f
+
+            // Safety check for page height
+            if (y > 650f) return@forEach
         }
 
-        y += 5f
-        canvas.drawLine(10f, y, 290f, y, paint)
-        y += 20f
+        y += 10f
+        canvas.drawLine(xMargin, y, 280f, y, paint)
+        y += 30f
 
-        paint.typeface = Typeface.DEFAULT_BOLD
-        paint.textSize = 14f
-        canvas.drawText("Total: ₹${String.format("%.2f", bill.totalAmount)}", 10f, y, paint)
+        // 5. Total
+        paint.textSize = 16f
+        paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        canvas.drawText("Total Amount:", xMargin, y, paint)
+        canvas.drawText(String.format("₹%.2f", bill.totalAmount), 180f, y, paint)
 
         pdfDocument.finishPage(page)
 
-        val resolver = context.contentResolver
+        // 6. File Saving (MediaStore API for Android 10+)
+        val fileName = "PillPoint_Bill_${bill.id}.pdf"
         val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, "Bill_${bill.id}_${System.currentTimeMillis()}.pdf")
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
             put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }
 
+        val resolver = context.contentResolver
         val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
+
         if (uri != null) {
             resolver.openOutputStream(uri)?.use { outputStream ->
                 pdfDocument.writeTo(outputStream)
             }
-            Toast.makeText(context, "Saved PDF to Downloads", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "PDF Saved to Downloads", Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(context, "Error creating file", Toast.LENGTH_SHORT).show()
+            throw Exception("Failed to create MediaStore entry")
         }
+
         pdfDocument.close()
     } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        Log.e("PDF_ERROR", "Error: ${e.message}")
+        Toast.makeText(context, "PDF Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
     }
 }
-
 @Composable
 fun ReceiptDialog(bill: Bill, onDismiss: () -> Unit) {
     val context = LocalContext.current
