@@ -117,8 +117,11 @@ Built for the Amravati Hackathon, Pill Point aims to digitize the healthcare sup
 **👥 Contributors**
 
  **Rijul Samaiya** - Lead Developer<br>
+ 
  **Shubh Jain** - Backend Developer<br>
+ 
  **Rupesh panda** - Frontend Developer<br>
+ 
  **Shreya Bhagat** - Research & Analysis<br>
 
 📄 License
