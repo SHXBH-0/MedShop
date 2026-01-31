@@ -191,7 +191,14 @@ data class Bill(
     val userId: String = ""
 )
 
-data class User(val uid: String, val email: String, val storeName: String)
+data class User(
+    val uid: String,
+    val email: String,
+    val storeName: String,
+    val phone: String = "",
+    val address: String = "",
+    val dlNo: String = ""
+)
 
 // --- 3. VIEWMODEL ---
 
@@ -241,9 +248,14 @@ class ShopViewModel : ViewModel() {
             db.collection("users").document(currentAuthUser.uid).get()
                 .addOnSuccessListener { document ->
                     if (document != null) {
-                        val storeName = document.getString("storeName") ?: "My Pharmacy"
+                        // Inside ShopViewModel init { ... }
+                        val storeName = document.getString("storeName") ?: ""
+                        val phone = document.getString("phone") ?: ""
+                        val address = document.getString("address") ?: ""
+                        val dlNo = document.getString("dlNo") ?: ""
                         val email = currentAuthUser.email ?: ""
-                        _currentUser.value = User(currentAuthUser.uid, email, storeName)
+
+                        _currentUser.value = User(currentAuthUser.uid, email, storeName, phone, address, dlNo)
                         startListeners(currentAuthUser.uid)
                     }
                     _isLoading.value = false
@@ -532,7 +544,18 @@ class ShopViewModel : ViewModel() {
         _cart.value = emptyList()
         return bill
     }
-
+    fun changePassword(newPass: String, onComplete: (Boolean, String?) -> Unit) {
+        val user = auth.currentUser
+        if (newPass.length < 6) {
+            onComplete(false, "Password must be at least 6 characters")
+            return
+        }
+        user?.updatePassword(newPass)
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) onComplete(true, null)
+                else onComplete(false, task.exception?.message)
+            }
+    }
     fun getSalesAnalysis(): Map<String, Double> {
         val now = Calendar.getInstance()
         val currentMonth = now.get(Calendar.MONTH)
@@ -683,7 +706,143 @@ fun OnboardingScreen(navController: NavController, viewModel: ShopViewModel) {
         }
     }
 }
+// --- ADD THIS AT THE VERY BOTTOM OF THE FILE (OUTSIDE ALL OTHER CLASSES) ---
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileScreen(viewModel: ShopViewModel, onOpen: () -> Unit) {
+    val user by viewModel.currentUser.collectAsState()
+    val context = LocalContext.current
+    var showPass by remember { mutableStateOf(false) }
+    var newP by remember { mutableStateOf("") }
+
+    if (showPass) {
+        AlertDialog(
+            onDismissRequest = { showPass = false },
+            title = { Text("Change Password") },
+            text = {
+                OutlinedTextField(
+                    value = newP,
+                    onValueChange = { newP = it },
+                    label = { Text("New Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.changePassword(newP) { s, e ->
+                        if(s) {
+                            showPass = false
+                            Toast.makeText(context, "Password Updated", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, e ?: "Error", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }) { Text("Update") }
+            },
+            dismissButton = { TextButton(onClick = { showPass = false }) { Text("Cancel") } }
+        )
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Profile ") },
+                navigationIcon = { IconButton(onClick = onOpen) { Icon(Icons.Default.Menu, null) } }
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(BrandBackground)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                SectionHeader("Business Registration Details")
+                Card(
+                    Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = BrandSurface),
+                    elevation = CardDefaults.cardElevation(2.dp)
+                ) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // Store Name
+                        ProfileDetailRow(Icons.Default.Store, "Pharmacy Name", user?.storeName ?: "N/A")
+
+                        HorizontalDivider(color = Color.LightGray.copy(0.3f))
+
+                        // Drug License
+                        ProfileDetailRow(Icons.Default.Badge, "Drug License (D.L.) No.", user?.dlNo ?: "N/A")
+
+                        HorizontalDivider(color = Color.LightGray.copy(0.3f))
+
+                        // Address
+                        ProfileDetailRow(Icons.Default.LocationOn, "Full Address", user?.address ?: "N/A")
+
+                        HorizontalDivider(color = Color.LightGray.copy(0.3f))
+
+                        // Contact Phone
+                        ProfileDetailRow(Icons.Default.Phone, "Mobile Number", user?.phone ?: "N/A")
+
+                        HorizontalDivider(color = Color.LightGray.copy(0.3f))
+
+                        // Email
+                        ProfileDetailRow(Icons.Default.Email, "Registered Email", user?.email ?: "N/A")
+                    }
+                }
+            }
+
+            item {
+                SectionHeader("Security")
+                Card(
+                    Modifier.fillMaxWidth().clickable { showPass = true },
+                    colors = CardDefaults.cardColors(containerColor = BrandSurface)
+                ) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Lock, null, tint = BrandPrimary)
+                        Spacer(Modifier.width(16.dp))
+                        Text("Change Password", fontWeight = FontWeight.Medium)
+                    }
+                }
+            }
+
+            item {
+                SectionHeader("About Pill Point")
+                Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = BrandSurface)) {
+                    Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.HealthAndSafety, null, Modifier.size(60.dp), BrandPrimary)
+                        Spacer(Modifier.height(8.dp))
+                        Text("Pill Point", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                        Text("Beyond Your Counter", color = BrandTextLight)
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            "Running a medical shop involves a lot of juggling, so we built Pill Point to make your daily operations smoother and more efficient. Think of it as your personal digital assistant that moves your work from the old manual registers directly to your smartphone. It allows you to generate accurate bills instantly, keep a close eye on your stock levels to prevent expiry losses, and quickly find medicine details using our smart search. By keeping all your supplier info and sales records in one safe place, Pill Point ensures you can spend less time on paperwork and more time caring for your customers.\n" +
+                                    "\n" +
+                                    "Version: 1.0.0 Copyright © 2026. All rights reserved.",
+                            textAlign = TextAlign.Center,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+
+            item {
+                Spacer(Modifier.height(24.dp))
+                Button(
+                    onClick = { viewModel.logout() },
+                    colors = ButtonDefaults.buttonColors(containerColor = AlertRed),
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("LOGOUT ACCOUNT", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
 @Composable
 fun LoginScreen(navController: NavController, viewModel: ShopViewModel) {
     val emailFocus = remember { FocusRequester() }
@@ -1027,16 +1186,14 @@ fun MainScreen(navController: NavController, viewModel: ShopViewModel) {
                 Spacer(Modifier.height(24.dp))
                 HorizontalDivider(color = Color.LightGray.copy(0.3f))
                 Spacer(Modifier.height(16.dp))
-                val navItems = listOf(Triple(0, Icons.Default.Dashboard, "dashboard"), Triple(1, Icons.Default.ShoppingCart, "new_sale"), Triple(2, Icons.Default.Medication, "inventory"), Triple(3, Icons.Default.AddBox, "add_new"), Triple(4, Icons.Default.Contacts, "dealers"), Triple(5, Icons.Default.History, "history"), Triple(6, Icons.Default.Analytics, "reports"))
+                val navItems = listOf(Triple(0, Icons.Default.Dashboard, "Dashboard"), Triple(1, Icons.Default.ShoppingCart, "Counter"), Triple(2, Icons.Default.Medication, "Inventory"), Triple(3, Icons.Default.AddBox, "Add Meds"), Triple(4, Icons.Default.Contacts, "Dealers"), Triple(5, Icons.Default.History, "History"), Triple(6, Icons.Default.Analytics, "Reports"), Triple(7, Icons.Default.Person, "Profile"))
                 navItems.forEach { (index, icon, key) ->
                     NavigationDrawerItem(
-                        label = { Text(Strings.get(key, lang), fontWeight = FontWeight.Medium) },
+                        label = { Text(key) }, // Simplified for code clarity
                         selected = selectedScreen == index,
                         onClick = { selectedScreen = index; scope.launch { drawerState.close() } },
                         icon = { Icon(icon, null) },
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = NavigationDrawerItemDefaults.colors(selectedContainerColor = BrandPrimary.copy(0.1f), selectedIconColor = BrandPrimary, selectedTextColor = BrandPrimary)
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                     )
                 }
                 Spacer(Modifier.weight(1f))
@@ -1058,6 +1215,7 @@ fun MainScreen(navController: NavController, viewModel: ShopViewModel) {
             4 -> DealersTab(viewModel) { scope.launch { drawerState.open() } }
             5 -> TransactionsScreen(viewModel) { scope.launch { drawerState.open() } }
             6 -> ReportsScreen(viewModel) { scope.launch { drawerState.open() } }
+            7 -> ProfileScreen(viewModel) { scope.launch { drawerState.open() } } // This fixes the error
         }
     }
 }
@@ -1649,6 +1807,8 @@ fun ReportsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
             }
         }
     }
+
+
 }
 
 @Composable fun SectionHeader(title: String) { Text(text = title, style = MaterialTheme.typography.labelLarge, color = BrandPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp, top = 16.dp, start = 4.dp)) }
@@ -1749,6 +1909,17 @@ fun saveBillAsPdf(context: Context, bill: Bill) {
     } catch (e: Exception) {
         Log.e("PDF_ERROR", "Error: ${e.message}")
         Toast.makeText(context, "PDF Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+    }
+}
+@Composable
+fun ProfileDetailRow(icon: ImageVector, label: String, value: String) {
+    Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
+        Icon(icon, null, tint = BrandPrimary, modifier = Modifier.size(20.dp).padding(top = 2.dp))
+        Spacer(Modifier.width(16.dp))
+        Column {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = BrandTextLight)
+            Text(value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, color = BrandTextDark)
+        }
     }
 }
 @Composable
