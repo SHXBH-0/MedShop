@@ -4,39 +4,38 @@
 
 **📖 Overview**
 
-Pill Point is a mobile-first digital operating system designed specifically for small and medium-sized pharmacies in Tier-2/Tier-3 cities. It bridges the gap between expensive desktop ERP software and manual "red notebooks," empowering pharmacists to manage billing, inventory, and suppliers directly from their smartphones.
+**Pill Point** is a mobile-first digital operating system designed specifically for small and medium-sized pharmacies in Tier-2/Tier-3 cities. It bridges the gap between expensive desktop ERP software and manual "red notebooks," empowering pharmacists to manage billing, inventory, and suppliers directly from their smartphones.
 
-Built for the Amravati Hackathon, Pill Point aims to digitize the healthcare supply chain at the grassroots level.
+**Pill Point** aims to digitize the healthcare supply chain at the grassroots level.
+
 
 **🚩 The Problem**
+  **Local medical stores currently suffer from:**
 
-  -Local medical stores currently suffer from:
+  ***-Manual Billing:*** Slow, error-prone calculations using calculators and paper.
 
-  -Manual Billing: Slow, error-prone calculations using calculators and paper.
+  ***-Inventory Blindness:*** No real-time visibility on stock levels or expiry dates.
 
-  -Inventory Blindness: No real-time visibility on stock levels or expiry dates.
+  ***-Supplier Disconnect:*** Contact details and purchase history scattered across visiting cards and diaries.
 
-  -Supplier Disconnect: Contact details and purchase history scattered across visiting cards and diaries.
-
-  -Lack of Analytics: No data on "Fast-moving" vs. "Slow-moving" medicines.
+  ***-Lack of Analytics:*** No data on "Fast-moving" vs. "Slow-moving" medicines.
 
 **💡 The Solution**
+  **Pill Point provides an all-in-one Android application that offers:**
 
--Pill Point provides an all-in-one Android application that offers:
+    -Smart POS(Point of Sale): Instant bill generation with auto-calculation of totals and taxes.
 
--Smart POS (Point of Sale): Instant bill generation with auto-calculation of totals and taxes.
+    -PDF Invoicing: Generates professional digital receipts instantly.
 
--PDF Invoicing: Generates professional digital receipts instantly.
+    -Global Medicine Search: Powered by Google Gemini AI to fetch global medicine details (Salt, Manufacturer) automatically.
 
--Global Medicine Search: Powered by Google Gemini AI to fetch global medicine details (Salt, Manufacturer) automatically.
+    -Inventory Intelligence: Categorized tracking (Tablets, Syrups, etc.) with low-stock alerts.
 
--Inventory Intelligence: Categorized tracking (Tablets, Syrups, etc.) with low-stock alerts.
-
--Supplier Directory: Direct "Click-to-Call" functionality and centralized dealer records.
+    -Supplier Directory: Direct "Click-to-Call" functionality and centralized dealer records.
 
 **📱 Key Features**
 
-   🔐 Secure Onboarding: Shop registration with Drug License Number verification.
+   🔐 Secure Onboarding: Shop registration with Drug License Number verification
 
    📦 Smart Inventory: Add stock with batch numbers, expiry dates, and categories.
 
@@ -54,65 +53,65 @@ Built for the Amravati Hackathon, Pill Point aims to digitize the healthcare sup
 
 **🛠️ Tech Stack**
 
- -Language: Kotlin
+ - Language: Kotlin
 
- -UI Framework: Jetpack Compose (Material 3 Design)
+ - UI Framework: Jetpack Compose (Material 3 Design)
 
- -Architecture: MVVM (Model-View-ViewModel)
+ - Architecture: MVVM (Model-View-ViewModel)
 
- -Backend: Firebase Authentication & Cloud Firestore
+ - Backend: Firebase Authentication & Cloud Firestore
 
- -AI Model: Google Gemini 1.5 Flash (via REST API)
+ - AI Model: Google Gemini 1.5 Flash (via REST API)
 
- -PDF Generation: Android Native PDF Document API
+ - PDF Generation: Android Native PDF Document API
 
 **🚀 Getting Started**
 
-  -Prerequisites
+  - Prerequisites
 
-  -Android Studio Hedgehog or later.
+  - Android Studio Hedgehog or later.
 
-  -Android Device/Emulator (Min SDK 24).
+  - Android Device/Emulator (Min SDK 24).
 
-  -A Google Cloud API Key (for Gemini).
+  - A Google Cloud API Key (for Gemini).
 
-  -google-services.json file (for Firebase).
+  - google-services.json file (for Firebase).
 
-  -Installation
+  - Installation
 
-  -Clone the repository:
+  - Clone the repository:
 
-  -git clone [[https://github.com/SHXBH-0/PillPoint.git](https://github.com/SHXBH-0/MedShop.git)]
-
+  - git clone [[https://github.com/SHXBH-0/PillPoint.git](https://github.com/SHXBH-0/MedShop.git)]
 
 
 **🔥Firebase Setup:**
 
-  -Create a project on Firebase Console.
+  - Create a project on Firebase Console.
 
-  -Enable Authentication (Email/Password) and Firestore Database.
+  - Enable Authentication (Email/Password) and Firestore Database.
 
-  -Download google-services.json and place it in the app/ directory.
+  - Download google-services.json and place it in the app/ directory.
 
-  -API Key Setup:
+  - API Key Setup:
 
-  -Open MainActivity.kt.
+  - Open MainActivity.kt.
+ 
+  - Replace YOUR_GEMINI_API_KEY_HERE with your actual API key.
 
-  -Replace YOUR_GEMINI_API_KEY_HERE with your actual API key.
+  - Build & Run:
 
-  -Build & Run:
-
-  -Sync Gradle files and run on an emulator or physical device.
+  - Sync Gradle files and run on an emulator or physical device.
   
 
 **🔮 Future Roadmap**
 
-- Integration with WhatsApp for sending bills directly to customers.
+  - Integration with WhatsApp for sending bills directly to customers.
 
-- Automated verification of Drug License Numbers with alerts for license expiration.
+  - Automated verification of Drug License Numbers with alerts for license expiration.
 
-- In-app Help Center featuring step-by-step tutorials and a Q&A support system.
+  - In-app Help Center featuring step-by-step tutorials and a Q&A support system.
 
+  - Seasonal demand forecasting to optimize inventory stock and prevent medicine wastage.
 
 **👥 Contributors**
 
