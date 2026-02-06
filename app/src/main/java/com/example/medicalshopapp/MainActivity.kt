@@ -1,17 +1,18 @@
 package com.example.medicalshopapp
 
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import androidx.compose.ui.graphics.asImageBitmap
+import android.graphics.Bitmap
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
-
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import kotlinx.coroutines.launch
-
-
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -26,6 +27,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.camera.core.ExperimentalGetImage
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,6 +48,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -61,6 +65,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.play.core.integrity.m
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
@@ -586,6 +591,8 @@ class ShopViewModel : ViewModel() {
 
 // --- 5. UI CODE ---
 
+
+
 val BrandPrimary = Color(0xFF0D9488)
 val BrandSecondary = Color(0xFF0F766E)
 val BrandBackground = Color(0xFFF3F4F6)
@@ -612,10 +619,10 @@ class MainActivity : ComponentActivity() {
                     onSurface = BrandTextDark
                 ),
                 typography = Typography(
-                    headlineLarge = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.ExtraBold, fontSize = 32.sp, color = BrandTextDark),
-                    headlineMedium = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp, color = BrandTextDark),
-                    titleMedium = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = BrandTextDark),
-                    bodyMedium = androidx.compose.ui.text.TextStyle(color = BrandTextLight, fontSize = 14.sp)
+                    headlineLarge = TextStyle(fontWeight = FontWeight.ExtraBold, fontSize = 32.sp, color = BrandTextDark),
+                    headlineMedium = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp, color = BrandTextDark),
+                    titleMedium = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = BrandTextDark),
+                    bodyMedium = TextStyle(color = BrandTextLight, fontSize = 14.sp)
                 )
             ) {
                 MedicalShopApp()
@@ -1164,6 +1171,7 @@ fun SignupScreen(navController: NavController, viewModel: ShopViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavController, viewModel: ShopViewModel) {
     val lang by viewModel.currentLanguage.collectAsState()
@@ -1316,12 +1324,51 @@ fun DashboardTab(navController: NavController, viewModel: ShopViewModel, onOpenD
     }
 }
 
+@androidx.annotation.OptIn(ExperimentalGetImage::class)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BarcodeScannerView(onBarcodeDetected: (String) -> Unit) {
+    val context = LocalContext.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val cameraProviderFuture = remember { androidx.camera.lifecycle.ProcessCameraProvider.getInstance(context) }
+
+    androidx.compose.ui.viewinterop.AndroidView(
+        factory = { ctx ->
+            val previewView = androidx.camera.view.PreviewView(ctx)
+            val executor = java.util.concurrent.Executors.newSingleThreadExecutor()
+            cameraProviderFuture.addListener({
+                val cameraProvider = cameraProviderFuture.get()
+                val preview = androidx.camera.core.Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
+                val scanner = com.google.mlkit.vision.barcode.BarcodeScanning.getClient()
+                val imageAnalysis = androidx.camera.core.ImageAnalysis.Builder()
+                    .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
+
+                imageAnalysis.setAnalyzer(executor) { imageProxy ->
+                    val mediaImage = imageProxy.image
+                    if (mediaImage != null) {
+                        val image = com.google.mlkit.vision.common.InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                        scanner.process(image)
+                            .addOnSuccessListener { barcodes ->
+                                for (barcode in barcodes) {
+                                    barcode.rawValue?.let { onBarcodeDetected(it) }
+                                }
+                            }
+                            .addOnCompleteListener { imageProxy.close() }
+                    }
+                }
+                cameraProvider.bindToLifecycle(lifecycleOwner, androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalysis)
+            }, androidx.core.content.ContextCompat.getMainExecutor(ctx))
+            previewView
+        },
+        modifier = Modifier.fillMaxWidth().height(250.dp)
+    )
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
-    // 1. Properly define Context at the top
+    // 1. Context and State Definitions
     val context = LocalContext.current
-
     val medicines by viewModel.medicinesFlow.collectAsState()
     val cart by viewModel.cartFlow.collectAsState()
     val lang by viewModel.currentLanguage.collectAsState()
@@ -1330,13 +1377,14 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
     var selectedMedicine by remember { mutableStateOf<Medicine?>(null) }
     var qtyInput by remember { mutableStateOf("1") }
 
-    // State for the Checkout Dialog
+    // Barcode and Checkout States
+    var isScanning by remember { mutableStateOf(false) }
     var showCheckoutDialog by remember { mutableStateOf(false) }
 
     val filteredList = medicines.filter { it.name.contains(searchQuery, true) && it.quantity > 0 }
     val cartTotal = cart.sumOf { it.totalAmount }
 
-    // --- DIALOG 1: QUANTITY PICKER WITH +/- BUTTONS ---
+    // --- DIALOG 1: QUANTITY PICKER (With +/- Buttons) ---
     if (selectedMedicine != null) {
         val med = selectedMedicine!!
         val currentQty = qtyInput.toIntOrNull() ?: 1
@@ -1354,7 +1402,7 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        // MINUS BUTTON (Manual background to avoid version errors)
+                        // MINUS
                         IconButton(
                             onClick = { if (currentQty > 1) qtyInput = (currentQty - 1).toString() },
                             modifier = Modifier.background(Color.LightGray.copy(alpha = 0.2f), CircleShape)
@@ -1368,18 +1416,17 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
                             color = BrandPrimary
                         )
 
-                        // PLUS BUTTON
+                        // PLUS
                         IconButton(
                             onClick = {
                                 if (currentQty < med.quantity) qtyInput = (currentQty + 1).toString()
-                                else Toast.makeText(context, "Max stock: ${med.quantity}", Toast.LENGTH_SHORT).show()
+                                else Toast.makeText(context, "Stock limit reached", Toast.LENGTH_SHORT).show()
                             },
                             modifier = Modifier.background(Color.LightGray.copy(alpha = 0.2f), CircleShape)
                         ) { Icon(Icons.Default.Add, "Increase", tint = BrandPrimary) }
                     }
-
                     Spacer(Modifier.height(8.dp))
-                    Text("Available: ${med.quantity}", style = MaterialTheme.typography.bodySmall)
+                    Text("Available Stock: ${med.quantity}", style = MaterialTheme.typography.bodySmall)
                 }
             },
             confirmButton = {
@@ -1409,14 +1456,16 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
                         value = tempName,
                         onValueChange = { tempName = it },
                         label = { Text("Customer Name") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
                     )
                     OutlinedTextField(
                         value = tempPhone,
                         onValueChange = { if(it.length <= 10) tempPhone = it },
                         label = { Text("Mobile Number") },
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        singleLine = true
                     )
                 }
             },
@@ -1424,15 +1473,17 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        viewModel.checkout(tempName, tempPhone)
+                        val bill = viewModel.checkout(tempName, tempPhone)
                         showCheckoutDialog = false
+                        bill?.let { saveBillAsPdf(context, it) }
                         Toast.makeText(context, "Sale Completed!", Toast.LENGTH_SHORT).show()
                     }
-                ) { Text("FINALIZE BILL") }
+                ) { Text("FINALIZE & PRINT") }
             }
         )
     }
 
+    // --- MAIN UI ---
     Scaffold(
         topBar = {
             TopAppBar(
@@ -1443,19 +1494,49 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
     ) { padding ->
         Column(Modifier.padding(padding).background(BrandBackground).fillMaxSize()) {
 
-            // Search Bar
-            OutlinedTextField(
-                searchQuery,
-                { searchQuery = it },
-                placeholder = { Text(Strings.get("search_hint", lang)) },
+            // BARCODE SCANNER BUTTON
+            Button(
+                onClick = { isScanning = !isScanning },
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = if (isScanning) AlertRed else BrandPrimary),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(if (isScanning) Icons.Default.Close else Icons.Default.QrCodeScanner, null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (isScanning) "STOP SCANNER" else "SCAN MEDICINE BARCODE")
+            }
+
+            // CAMERA SCANNER VIEW
+            if (isScanning) {
+                Card(
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(250.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    BarcodeScannerView { barcode ->
+                        val match = medicines.find { it.id == barcode || it.shortId == barcode }
+                        if (match != null) {
+                            selectedMedicine = match
+                            isScanning = false
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+
+            // SEARCH BAR
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text(Strings.get("search_hint", lang)) },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 leadingIcon = { Icon(Icons.Default.Search, null) },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
             )
 
-            // Items List
-            LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(horizontal = 16.dp)) {
+            // ITEM LIST
+            LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(16.dp)) {
                 items(filteredList) { item ->
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).clickable { selectedMedicine = item },
@@ -1472,9 +1553,9 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
                 }
             }
 
-            // Bottom Cart Summary
+            // BOTTOM CHECKOUT BAR
             if (cart.isNotEmpty()) {
-                Surface(modifier = Modifier.fillMaxWidth(), shadowElevation = 8.dp) {
+                Surface(modifier = Modifier.fillMaxWidth(), shadowElevation = 16.dp) {
                     Column(Modifier.padding(16.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text("${cart.size} Items", fontWeight = FontWeight.Medium)
@@ -1483,10 +1564,9 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
                         Spacer(Modifier.height(12.dp))
                         Button(
                             onClick = { showCheckoutDialog = true },
-                            modifier = Modifier.fillMaxWidth().height(56.dp)
-                        ) {
-                            Text("PROCEED TO CHECKOUT")
-                        }
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) { Text("PROCEED TO CHECKOUT") }
                     }
                 }
             }
@@ -1498,8 +1578,18 @@ fun PosScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 fun InventoryTab(viewModel: ShopViewModel, onOpen: () -> Unit) {
     val meds by viewModel.medicinesFlow.collectAsState()
     val apiResults by viewModel.apiResults.collectAsState()
-    var q by remember { mutableStateOf("") }
+    val lang by viewModel.currentLanguage.collectAsState()
+
+// Inside InventoryTab or a Detail Dialog
+        var q by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("All") }
     var itemToDelete by remember { mutableStateOf<Medicine?>(null) }
+
+    // Filter logic
+    val filteredMeds = meds.filter {
+        (selectedCategory == "All" || it.category == selectedCategory) &&
+                it.name.contains(q, ignoreCase = true)
+    }
 
     if (itemToDelete != null) {
         AlertDialog(
@@ -1518,24 +1608,130 @@ fun InventoryTab(viewModel: ShopViewModel, onOpen: () -> Unit) {
         )
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text("Inventory") }, navigationIcon = { IconButton(onClick = onOpen) { Icon(Icons.Default.Menu, null) } }) }) { p ->
-        Column(Modifier.padding(p).padding(16.dp)) {
-            OutlinedTextField(q, { q = it; viewModel.searchApi(it) }, label = { Text("Search Global") }, modifier = Modifier.fillMaxWidth())
-            if (apiResults.isNotEmpty()) {
-                apiResults.forEach { res -> Card(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { viewModel.addStock(Medicine(name = res.name, saltName = res.salt)); viewModel.clearApiResults() }) { Text(res.name, Modifier.padding(8.dp)) } }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(Strings.get("inventory", lang), fontWeight = FontWeight.Bold) },
+                navigationIcon = { IconButton(onClick = onOpen) { Icon(Icons.Default.Menu, null) } }
+            )
+        }
+    ) { p ->
+        Column(Modifier.padding(p).fillMaxSize().background(BrandBackground)) {
+
+            // 1. Global Search Section
+            Column(Modifier.padding(16.dp)) {
+                OutlinedTextField(
+                    value = q,
+                    onValueChange = { q = it; viewModel.searchApi(it) },
+                    label = { Text("Search Inventory / Global") },
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = { Icon(Icons.Default.Search, null) },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandPrimary)
+                )
+
+                if (apiResults.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier.padding(top = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        colors = CardDefaults.cardColors(containerColor = BrandSurface)
+                    ) {
+                        apiResults.forEach { res ->
+                            ListItem(
+                                headlineContent = { Text(res.name, fontWeight = FontWeight.Bold) },
+                                supportingContent = { Text(res.salt) },
+                                trailingContent = { Icon(
+                                    Icons.Default.Add, tint = BrandPrimary,
+                                    contentDescription = TODO(),
+                                    modifier = TODO()
+                                ) },
+                                modifier = Modifier.clickable {
+                                    viewModel.addStock(Medicine(name = res.name, saltName = res.salt, category = res.defaultCategory))
+                                    viewModel.clearApi()
+                                }
+                            )
+                        }
+                    }
+                }
             }
-            HorizontalDivider(Modifier.padding(vertical = 16.dp))
-            LazyColumn {
-                items(meds) { m ->
-                    Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text(m.name, fontWeight = FontWeight.Bold)
-                                Text(m.batchNo, style = MaterialTheme.typography.labelSmall)
+
+            // 2. Category Filter Row
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedCategory == "All",
+                        onClick = { selectedCategory = "All" },
+                        label = { Text("All") }
+                    )
+                }
+                items(CategoryUtils.categories) { cat ->
+                    FilterChip(
+                        selected = selectedCategory == cat.name,
+                        onClick = { selectedCategory = cat.name },
+                        label = { Text(cat.name) },
+                        leadingIcon = { Icon(cat.icon, null, modifier = Modifier.size(18.dp)) }
+                    )
+                }
+            }
+
+            // 3. Inventory List
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (filteredMeds.isEmpty()) {
+                    item {
+                        Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No items found", color = BrandTextLight)
+                        }
+                    }
+                }
+
+                items(filteredMeds) { m ->
+                    val catInfo = CategoryUtils.categories.find { it.name == m.category }
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = BrandSurface)
+                    ) {
+                        Row(
+                            Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .background(catInfo?.color ?: Color.LightGray.copy(0.2f), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = catInfo?.icon ?: Icons.Default.Inventory,
+                                    contentDescription = null,
+                                    tint = BrandPrimary // Named parameter ensures it matches the correct candidate
+                                )
                             }
-                            Text("Qty: ${m.quantity}", color = if(m.quantity < 5) AlertRed else Color.Unspecified, modifier = Modifier.padding(horizontal = 8.dp))
-                            IconButton(onClick = { itemToDelete = m }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = AlertRed)
+
+                            Spacer(Modifier.width(16.dp))
+
+                            Column(Modifier.weight(1f)) {
+                                Text(m.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text("Batch: ${m.batchNo} | Exp: ${m.expiryDate}", style = MaterialTheme.typography.labelSmall, color = BrandTextLight)
+                                Text(m.category, style = MaterialTheme.typography.labelSmall, color = BrandPrimary)
+                            }
+
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(
+                                    "Qty: ${m.quantity}",
+                                    fontWeight = FontWeight.Bold,
+                                    color = if(m.quantity < 5) AlertRed else BrandTextDark
+                                )
+                                IconButton(onClick = { itemToDelete = m }) {
+                                    Icon(Icons.Default.Delete, "Delete", tint = AlertRed.copy(alpha = 0.6f))
+                                }
                             }
                         }
                     }
@@ -1544,6 +1740,11 @@ fun InventoryTab(viewModel: ShopViewModel, onOpen: () -> Unit) {
         }
     }
 }
+
+private fun ShopViewModel.clearApi() {
+    TODO("Not yet implemented")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
@@ -1816,6 +2017,18 @@ fun ReportsScreen(viewModel: ShopViewModel, onOpenDrawer: () -> Unit) {
 
 // --- UTILS FOR PDF & DIALOG ---
 
+fun generateBarcode(text: String): android.graphics.Bitmap {
+    val width = 500
+    val height = 150
+    val matrix = MultiFormatWriter().encode(text, BarcodeFormat.CODE_128, width, height)
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+    for (x in 0 until width) {
+        for (y in 0 until height) {
+            bitmap.setPixel(x, y, if (matrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+        }
+    }
+    return bitmap
+}
 fun saveBillAsPdf(context: Context, bill: Bill) {
     try {
         val pdfDocument = PdfDocument()
